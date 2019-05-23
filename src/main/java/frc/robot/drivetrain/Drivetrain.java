@@ -22,6 +22,7 @@ import com.team319.models.LeaderBobTalonSRX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.drivetrain.commands.JoshDrive;
 
 /**
  * An example subsystem. You can replace me with your own Subsystem.
@@ -46,14 +47,14 @@ public class Drivetrain extends Subsystem {
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
 
-  private static int RIGHT_MASTER_ID = 11;
-  private static int RIGHT_SLAVE_1_ID = 12;
-  private static int RIGHT_SLAVE_2_ID = 13;
-  private static int LEFT_MASTER_ID = 14;
-  private static int LEFT_SLAVE_1_ID = 15;
-  private static int LEFT_SLAVE_2_ID = 16;
+  private static int RIGHT_MASTER_ID = 12;
+  private static int RIGHT_SLAVE_1_ID = 11;
+  private static int RIGHT_SLAVE_2_ID = 10;
+  private static int LEFT_MASTER_ID = 23;
+  private static int LEFT_SLAVE_1_ID = 24;
+  private static int LEFT_SLAVE_2_ID = 25;
 
-  private static int PIGEON_ID = 17;
+  private static int PIGEON_ID = 10;
 
   //  Competition & Practice Bot  Talon Masters with Victors as Slaves.
   private BaseMotorController rightSlave1 = new BobTalonSRX(RIGHT_SLAVE_1_ID);
@@ -61,10 +62,8 @@ public class Drivetrain extends Subsystem {
   private BaseMotorController leftSlave1 = new BobTalonSRX(LEFT_SLAVE_1_ID);
   private BaseMotorController leftSlave2 = new BobTalonSRX(LEFT_SLAVE_2_ID);
 
-  private LeaderBobTalonSRX left = new LeaderBobTalonSRX(LEFT_MASTER_ID,
-      leftSlave1, leftSlave2);
-  private LeaderBobTalonSRX right = new LeaderBobTalonSRX(RIGHT_MASTER_ID,
-      rightSlave1, rightSlave2);
+  private LeaderBobTalonSRX left = new LeaderBobTalonSRX(LEFT_MASTER_ID, leftSlave1, leftSlave2);
+  private LeaderBobTalonSRX right = new LeaderBobTalonSRX(RIGHT_MASTER_ID, rightSlave1, rightSlave2);
 
   PowerDistributionPanel pdp = new PowerDistributionPanel();
   private PigeonIMU pigeon = new PigeonIMU(PIGEON_ID);
@@ -83,12 +82,15 @@ public class Drivetrain extends Subsystem {
 
   @Override
   public void initDefaultCommand() {
-    // setDefaultCommand(new NormalizedArcadeDrive());
+    setDefaultCommand(new JoshDrive());
   }
 
   public void tankDrive(double leftPercent, double rightPercent) {
-    left.set(PercentOutput, convertFromFeetToTicks(leftPercent * MAX_VELOCITY_IN_FPS));
-    right.set(PercentOutput, convertFromFeetToTicks(rightPercent * MAX_VELOCITY_IN_FPS));
+    left.set(PercentOutput, leftPercent);
+    right.set(PercentOutput, rightPercent);
+
+    // left.set(Velocity, convertFromFeetToTicks(leftPercent * MAX_VELOCITY_IN_FPS));
+    // right.set(Velocity, convertFromFeetToTicks(rightPercent * MAX_VELOCITY_IN_FPS));
   }
 
   private void setPIDFValues() {
