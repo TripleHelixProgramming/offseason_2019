@@ -48,25 +48,6 @@ public class OI {
   public double getTurn() {
     return driver.getRawAxis(ControllerMap.RIGHT_STICK_X);
   }
-  
-  public double getArmPower() {
-    double stick = -operator.getRawAxis(ControllerMap.LEFT_STICK_Y);
-    stick *= Math.abs(stick);
-    if (Math.abs(stick) < 0.05) {
-      stick = 0;
-    }
-    return stick;
-  }
-
-  public double getWristPower() {
-    double stick = -operator.getRawAxis(ControllerMap.RIGHT_STICK_Y);
-    stick *= Math.abs(stick);
-    if (Math.abs(stick) < 0.05) {
-      stick = 0;
-    }
-    return stick;
-  }
-
   // public double getGMPOV() {
   //   return operator.getPOV();
   // }

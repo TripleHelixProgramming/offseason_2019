@@ -11,6 +11,8 @@ import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 import static com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
 import static java.lang.Math.PI;
+import static frc.robot.drivetrain.HelixMath.convertFromTicksToFeet;
+import static frc.robot.drivetrain.HelixMath.convertFromTicksPer100MsToFps;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -22,7 +24,7 @@ import com.team319.models.LeaderBobTalonSRX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.drivetrain.commands.JoshDrive;
+// import frc.robot.drivetrain.commands.JoshDrive;
 
 /**
  * An example subsystem. You can replace me with your own Subsystem.
@@ -41,20 +43,20 @@ public class Drivetrain extends Subsystem {
     return INSTANCE;
   }
 
-  private static final double WHEEL_DIAMETER_IN_INCHES = 5;
-  private static final int ENCODER_TICKS_PER_REVOLUTION = 120;
+  private final double WHEEL_DIAMETER_IN_INCHES = 5;
+  private final int ENCODER_TICKS_PER_REVOLUTION = 120;
   public static final double MAX_VELOCITY_IN_FPS = 10;
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
 
-  private static int RIGHT_MASTER_ID = 12;
-  private static int RIGHT_SLAVE_1_ID = 11;
-  private static int RIGHT_SLAVE_2_ID = 10;
-  private static int LEFT_MASTER_ID = 23;
-  private static int LEFT_SLAVE_1_ID = 24;
-  private static int LEFT_SLAVE_2_ID = 25;
+  private int RIGHT_MASTER_ID = 12;
+  private int RIGHT_SLAVE_1_ID = 11;
+  private int RIGHT_SLAVE_2_ID = 10;
+  private int LEFT_MASTER_ID = 23;
+  private int LEFT_SLAVE_1_ID = 24;
+  private int LEFT_SLAVE_2_ID = 25;
 
-  private static int PIGEON_ID = 10;
+  private int PIGEON_ID = 10;
 
   //  Competition & Practice Bot  Talon Masters with Victors as Slaves.
   private BaseMotorController rightSlave1 = new BobTalonSRX(RIGHT_SLAVE_1_ID);
@@ -65,7 +67,7 @@ public class Drivetrain extends Subsystem {
   private LeaderBobTalonSRX left = new LeaderBobTalonSRX(LEFT_MASTER_ID, leftSlave1, leftSlave2);
   private LeaderBobTalonSRX right = new LeaderBobTalonSRX(RIGHT_MASTER_ID, rightSlave1, rightSlave2);
 
-  PowerDistributionPanel pdp = new PowerDistributionPanel();
+  private PowerDistributionPanel pdp = new PowerDistributionPanel();
   private PigeonIMU pigeon = new PigeonIMU(PIGEON_ID);
 
   private Drivetrain() {
@@ -82,15 +84,15 @@ public class Drivetrain extends Subsystem {
 
   @Override
   public void initDefaultCommand() {
-    setDefaultCommand(new JoshDrive());
+    // setDefaultCommand(new JoshDrive());
   }
 
   public void tankDrive(double leftPercent, double rightPercent) {
     left.set(PercentOutput, leftPercent);
     right.set(PercentOutput, rightPercent);
 
-    // left.set(Velocity, convertFromFeetToTicks(leftPercent * MAX_VELOCITY_IN_FPS));
-    // right.set(Velocity, convertFromFeetToTicks(rightPercent * MAX_VELOCITY_IN_FPS));
+    // left.set(Velocity, convertFromFpsToTicksPer10Ms(leftPercent * MAX_VELOCITY_IN_FPS));
+    // right.set(Velocity, convertFromFpsToTicksPer10Ms(rightPercent * MAX_VELOCITY_IN_FPS));
   }
 
   private void setPIDFValues() {
@@ -109,7 +111,6 @@ public class Drivetrain extends Subsystem {
   }
 
   private void setupLogs() {
-
     // HelixLogger.getInstance().addDoubleSource("TOTAL CURRENT", pdp::getTotalCurrent);
     // HelixLogger.getInstance().addDoubleSource("DT LM Current", left::getOutputCurrent);
     // HelixLogger.getInstance().addDoubleSource("DT RM Current", right::getOutputCurrent);
@@ -144,27 +145,19 @@ public class Drivetrain extends Subsystem {
   }
 
   public double getLeftVelocity() {
-    try {
-      return convertFromTicksToFeet(left.getSelectedSensorVelocity());
-    } catch(Exception e) {
-      SmartDashboard.putString("Exception", e.getMessage());
-      return 100000000;
-    } catch(Throwable t) {
-      SmartDashboard.putString("Exception", t.getMessage());
-      return 1999999999;
-    }
+      return convertFromTicksPer100MsToFps(left.getSelectedSensorVelocity(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   public double getRightVelocity() {
-    return convertFromTicksToFeet(right.getSelectedSensorVelocity());
+    return convertFromTicksPer100MsToFps(right.getSelectedSensorVelocity(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   public double getLeftPosition() {
-    return convertFromTicksToFeet(left.getSelectedSensorPosition());
+    return convertFromTicksToFeet(left.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   public double getRightPosition() {
-    return  convertFromTicksToFeet(right.getSelectedSensorPosition());
+    return  convertFromTicksToFeet(right.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   @Override
@@ -172,13 +165,5 @@ public class Drivetrain extends Subsystem {
     SmartDashboard.putNumber("Pigeon Yaw", getYaw());
     SmartDashboard.putNumber("Left Velocity", getLeftVelocity());
     SmartDashboard.putNumber("Right Velocity", getRightVelocity());
-  }
-
-  private double convertFromTicksToFeet(int ticks) {
-    return PI * WHEEL_DIAMETER_IN_INCHES * ticks / ENCODER_TICKS_PER_REVOLUTION;
-  }
-
-  private double convertFromFeetToTicks(double feet) {
-    return ENCODER_TICKS_PER_REVOLUTION * feet / (PI * WHEEL_DIAMETER_IN_INCHES);
   }
 }
