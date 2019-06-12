@@ -7,12 +7,10 @@
 
 package frc.robot.drivetrain;
 
-import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 import static com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
-import static java.lang.Math.PI;
-import static frc.robot.drivetrain.HelixMath.convertFromTicksToFeet;
 import static frc.robot.drivetrain.HelixMath.convertFromTicksPer100MsToFps;
+import static frc.robot.drivetrain.HelixMath.convertFromTicksToFeet;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
