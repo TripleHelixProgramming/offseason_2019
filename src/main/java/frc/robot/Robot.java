@@ -10,13 +10,13 @@ package frc.robot;
 import com.team2363.logger.HelixEvents;
 import com.team2363.logger.HelixLogger;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import frc.robot.oi.OI;
 
-import static frc.robot.drivetrain.Drivetrain.getDrivetrain;;
+import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
+import static frc.robot.oi.OI.getOI;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,11 +26,6 @@ import static frc.robot.drivetrain.Drivetrain.getDrivetrain;;
  * project.
  */
 public class Robot extends TimedRobot {
-  //public static ExampleSubsystem m_subsystem = new ExampleSubsystem();
-  public static OI m_oi;
-	
-  private final Compressor compressor = new Compressor();
-
   Command autonomousCommand;
 
   /**
@@ -44,7 +39,7 @@ public class Robot extends TimedRobot {
   }
 
   private void initializeSubsystems() {
-    OI.getOI();
+    getOI();
     getDrivetrain();
   }
 

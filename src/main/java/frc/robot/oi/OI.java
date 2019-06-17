@@ -8,7 +8,12 @@
 package frc.robot.oi;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+
+import static com.team2363.utilities.ControllerMap.X_BOX_LEFT_STICK_Y;
+import static com.team2363.utilities.ControllerMap.X_BOX_RIGHT_STICK_X;
+
 import edu.wpi.first.wpilibj.Joystick;
+
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -38,7 +43,7 @@ public class OI {
    * @return the raw controller throttle
    */
   public double getThrottle() {
-    return -driver.getRawAxis(ControllerMap.LEFT_STICK_Y); 
+    return -driver.getRawAxis(X_BOX_LEFT_STICK_Y); 
     // return -driver.getRawAxis(ControllerMap.LEFT_TRIGGER) + driver.getRawAxis(ControllerMap.RIGHT_TRIGGER);
 	}
   
@@ -46,7 +51,7 @@ public class OI {
    * @return the raw controller turn
    */
   public double getTurn() {
-    return driver.getRawAxis(ControllerMap.RIGHT_STICK_X);
+    return driver.getRawAxis(X_BOX_RIGHT_STICK_X);
   }
   // public double getGMPOV() {
   //   return operator.getPOV();
