@@ -10,9 +10,11 @@ package frc.robot.drivetrain.commands;
 import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
 import static frc.robot.oi.OI.getOI;
 import static java.lang.Math.abs;
-import static frc.robot.drivetrain.HelixMath.constrainToRange;
 
 import com.team2363.commands.NormalizedArcadeDrive;
+import com.team2363.controller.PIDController;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This command will check to see if there is no turn command being applied and will attempt to 
@@ -20,11 +22,12 @@ import com.team2363.commands.NormalizedArcadeDrive;
  */
 public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
-  private Double holdHeading = null;
-  private double kP = 0.1;
+  private PIDController controller = new PIDController(0, 0, 0, 0.02);
+  private boolean holdingHeading;
 
   public StraightAssistedDrive() {
     super(getDrivetrain());
+    controller.setOutputRange(-1, 1);
   }
 
   @Override
@@ -40,21 +43,30 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
     // Is the robot being commanded to turn? If yes then use that as the command and reset the hold heading
     if (turnPower > 0.05) {
-      holdHeading = null;
+      holdingHeading = false;
       return turn;
     }
 
     // Set the hold heading if this is the first time we see no turn command
-    if (holdHeading == null) {
-      holdHeading = currentHeading;
+    if (!holdingHeading) {
+      holdingHeading = true;
+      controller.reset();
+      controller.setReference(currentHeading);
     }
 
     // Return the P controlled error as our turn value to keep our current heading
-    return constrainToRange(-1, 1, (currentHeading - holdHeading) * kP);
+    return controller.calculate(currentHeading);
   }
 
   @Override
   protected void useOutputs(double left, double right) {
     getDrivetrain().tankDrive(left, right);
+  }
+
+  @Override
+  protected void execute() {
+    super.execute();
+    SmartDashboard.putBoolean("Holding Heading", holdingHeading);
+    SmartDashboard.putNumber("Hold Heading", controller.getReference());
   }
 }
