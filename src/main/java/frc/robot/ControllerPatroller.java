@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -10,7 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class ControllerPatroller {
 
-    private static ControllerPatroller patroller;
+    private static ControllerPatroller patroller = new ControllerPatroller();
 
     /**
      * Retrieve the singleton instance of the ControllerPatroller
@@ -25,27 +26,36 @@ public class ControllerPatroller {
         return patroller;
     }
 
-    // The ordered list of user defined joysticks
     private List<Joystick> controllers = new ArrayList<>();
 
     /**
      * @param controllerNames the list of controller names in the order the user would like to access them
      */
     private ControllerPatroller() {
-        createJoysticks();
-    }
-
-    // Create joysticks for all six slots so we can see what their names are
-    private void createJoysticks() {
+        // Create a joystick at each port so we can check their names later
+        // Most of these objects will go unused
         for (int i = 0; i < 6; i++) {
             controllers.add(new Joystick(i));
-        }
+        } 
     }
 
     /**
-     * @param index the index of the controller to access
+     * @param name the name of the controller to access
+     * @param defaultPort the port to access if a controller with the provided name is not found
+     * 
+     * @return the joystick with the provided name or at the provided defaultPort
      */
-    public Joystick get(String name) {
-        return controllers.stream().filter(c -> c.getName().contains(name)).findFirst().get();
+    public Joystick get(String name, int defaultPort) {
+        // Filter the list of controllers for ones that contain the provided name
+        Optional<Joystick> joystick = controllers.stream()
+            .filter(c -> c.getName().toLowerCase().contains(name.toLowerCase()))
+            .findFirst();
+
+        if (joystick.isPresent()) {
+            return joystick.get();
+        }
+
+        // If we didn't find a controller with the provided name return the one at the default port
+        return controllers.get(defaultPort);
     }
 }
