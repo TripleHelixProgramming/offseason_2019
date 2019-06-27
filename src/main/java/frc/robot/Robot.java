@@ -7,16 +7,16 @@
 
 package frc.robot;
 
+import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
+import static frc.robot.oi.OI.getOI;
+
 import com.team2363.logger.HelixEvents;
 import com.team2363.logger.HelixLogger;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import frc.robot.oi.OI;
-
-import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
-import static frc.robot.oi.OI.getOI;
+import frc.robot.drivetrain.commands.PathFollower;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     getDrivetrain().resetHeading();
-    autonomousCommand = null;
+    autonomousCommand = new PathFollower("5_feet_forward");
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.start();

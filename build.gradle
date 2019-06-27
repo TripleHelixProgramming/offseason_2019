@@ -55,7 +55,7 @@ dependencies {
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
     testCompile 'junit:junit:4.12'
 
-    implementation 'com.github.TripleHelixProgramming:HelixUtilities:master-SNAPSHOT'
+    compile 'com.github.TripleHelixProgramming:HelixUtilities:master-SNAPSHOT'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')

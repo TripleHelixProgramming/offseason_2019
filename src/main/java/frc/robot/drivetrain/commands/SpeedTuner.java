@@ -9,6 +9,7 @@ package frc.robot.drivetrain.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.drivetrain.Drivetrain;
+import frc.robot.oi.OI;
 
 public class SpeedTuner extends Command {
   public SpeedTuner() {
@@ -23,7 +24,7 @@ public class SpeedTuner extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivetrain.getDrivetrain().tankDrive(0.25, 0.25);
+    Drivetrain.getDrivetrain().tankDrive(OI.getOI().getThrottle(), OI.getOI().getThrottle());
   }
 
   // Make this return true when this Command no longer needs to run execute()

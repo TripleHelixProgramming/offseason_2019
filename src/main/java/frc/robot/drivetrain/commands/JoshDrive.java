@@ -17,7 +17,7 @@ import frc.robot.oi.OI;
  */
 public class JoshDrive extends NormalizedArcadeDrive {
 
-    private static double THROTTLE_SCALAR = 0.6;
+    private static double THROTTLE_SCALAR = 1;
 
     public JoshDrive() {
         super(Drivetrain.getDrivetrain());

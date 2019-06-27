@@ -22,7 +22,7 @@ import com.team319.models.LeaderBobTalonSRX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import frc.robot.drivetrain.commands.JoshDrive;
+import frc.robot.drivetrain.commands.JoshDrive;
 
 /**
  * An example subsystem. You can replace me with your own Subsystem.
@@ -41,9 +41,9 @@ public class Drivetrain extends Subsystem {
     return INSTANCE;
   }
 
-  private final double WHEEL_DIAMETER_IN_INCHES = 5;
-  private final int ENCODER_TICKS_PER_REVOLUTION = 120;
-  public static final double MAX_VELOCITY_IN_FPS = 10;
+  private final double WHEEL_DIAMETER_IN_INCHES = 4;
+  private final int ENCODER_TICKS_PER_REVOLUTION = 480;
+  public static final double MAX_VELOCITY_IN_FPS = 14;
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
 
@@ -58,7 +58,7 @@ public class Drivetrain extends Subsystem {
 
   //  Competition & Practice Bot  Talon Masters with Victors as Slaves.
   private BaseMotorController rightSlave1 = new BobTalonSRX(RIGHT_SLAVE_1_ID);
-  private BaseMotorController rightSlave2 = new BobTalonSRX(RIGHT_SLAVE_2_ID);
+  private BobTalonSRX rightSlave2 = new BobTalonSRX(RIGHT_SLAVE_2_ID);
   private BaseMotorController leftSlave1 = new BobTalonSRX(LEFT_SLAVE_1_ID);
   private BaseMotorController leftSlave2 = new BobTalonSRX(LEFT_SLAVE_2_ID);
 
@@ -66,7 +66,7 @@ public class Drivetrain extends Subsystem {
   private LeaderBobTalonSRX right = new LeaderBobTalonSRX(RIGHT_MASTER_ID, rightSlave1, rightSlave2);
 
   private PowerDistributionPanel pdp = new PowerDistributionPanel();
-  private PigeonIMU pigeon = new PigeonIMU(PIGEON_ID);
+  private PigeonIMU pigeon = new PigeonIMU(rightSlave2);
 
   private Drivetrain() {
     setPIDFValues();
@@ -82,7 +82,7 @@ public class Drivetrain extends Subsystem {
 
   @Override
   public void initDefaultCommand() {
-    // setDefaultCommand(new JoshDrive());
+    setDefaultCommand(new JoshDrive());
   }
 
   public void tankDrive(double leftPercent, double rightPercent) {
@@ -163,5 +163,7 @@ public class Drivetrain extends Subsystem {
     SmartDashboard.putNumber("Pigeon Yaw", getYaw());
     SmartDashboard.putNumber("Left Velocity", getLeftVelocity());
     SmartDashboard.putNumber("Right Velocity", getRightVelocity());
+    SmartDashboard.putNumber("Left Distance", getLeftPosition());
+    SmartDashboard.putNumber("Right Distance", getRightPosition());
   }
 }

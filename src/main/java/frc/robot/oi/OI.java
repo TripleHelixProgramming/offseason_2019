@@ -7,13 +7,11 @@
 
 package frc.robot.oi;
 
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-
 import static com.team2363.utilities.ControllerMap.X_BOX_LEFT_STICK_Y;
 import static com.team2363.utilities.ControllerMap.X_BOX_RIGHT_STICK_X;
+import static frc.robot.ControllerPatroller.getPatroller;
 
-import edu.wpi.first.wpilibj.Joystick;
-
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -33,8 +31,10 @@ public class OI {
     return INSTANCE;
   }
 
-  private final Joystick driver = new Joystick(1);
-  private final Joystick operator = new Joystick(2);
+  private final String DRIVER = "Xbox";
+  private final int DRIVER_PORT = 0;
+  private final String OPERATOR = "P4";
+  private final int OPERATOR_PORT = 1;
 
   private OI() {
   }
@@ -43,15 +43,14 @@ public class OI {
    * @return the raw controller throttle
    */
   public double getThrottle() {
-    return -driver.getRawAxis(X_BOX_LEFT_STICK_Y); 
-    // return -driver.getRawAxis(ControllerMap.LEFT_TRIGGER) + driver.getRawAxis(ControllerMap.RIGHT_TRIGGER);
+    return getPatroller().get(DRIVER, DRIVER_PORT).getRawAxis(X_BOX_LEFT_STICK_Y); 
 	}
   
   /**
    * @return the raw controller turn
    */
   public double getTurn() {
-    return driver.getRawAxis(X_BOX_RIGHT_STICK_X);
+    return getPatroller().get(DRIVER, DRIVER_PORT).getRawAxis(X_BOX_RIGHT_STICK_X);
   }
   // public double getGMPOV() {
   //   return operator.getPOV();
@@ -63,15 +62,15 @@ public class OI {
 	 */
 	public void setControllerRumble(boolean state) {
 		if (state == true) {
-			driver.setRumble(RumbleType.kLeftRumble, 1);
-			driver.setRumble(RumbleType.kRightRumble, 1);  
-			operator.setRumble(RumbleType.kLeftRumble, 1);
-			operator.setRumble(RumbleType.kRightRumble, 1);
+			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kLeftRumble, 1);
+			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kRightRumble, 1);  
+			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kLeftRumble, 1);
+			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kRightRumble, 1);
 		} else {
-			driver.setRumble(RumbleType.kLeftRumble, 0);
-			driver.setRumble(RumbleType.kRightRumble, 0);
-			operator.setRumble(RumbleType.kLeftRumble, 0);
-			operator.setRumble(RumbleType.kRightRumble, 0);
+			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kLeftRumble, 0);
+			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kRightRumble, 0);
+			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kLeftRumble, 0);
+			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kRightRumble, 0);
 		}
 	}
 }
