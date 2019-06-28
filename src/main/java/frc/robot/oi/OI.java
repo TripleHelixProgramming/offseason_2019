@@ -11,6 +11,7 @@ import static com.team2363.utilities.ControllerMap.X_BOX_LEFT_STICK_Y;
 import static com.team2363.utilities.ControllerMap.X_BOX_RIGHT_STICK_X;
 import static frc.robot.ControllerPatroller.getPatroller;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 /**
@@ -36,41 +37,41 @@ public class OI {
   private final String OPERATOR = "P4";
   private final int OPERATOR_PORT = 1;
 
-  private OI() {
-  }
+  private Joystick driver = getPatroller().get(DRIVER, DRIVER_PORT);
+  private Joystick operator = getPatroller().get(OPERATOR, OPERATOR_PORT);
+
+  private OI() { }
 
   /**
    * @return the raw controller throttle
    */
   public double getThrottle() {
-    return getPatroller().get(DRIVER, DRIVER_PORT).getRawAxis(X_BOX_LEFT_STICK_Y); 
+    return driver.getRawAxis(X_BOX_LEFT_STICK_Y); 
 	}
   
   /**
    * @return the raw controller turn
    */
   public double getTurn() {
-    return getPatroller().get(DRIVER, DRIVER_PORT).getRawAxis(X_BOX_RIGHT_STICK_X);
+    return driver.getRawAxis(X_BOX_RIGHT_STICK_X);
   }
-  // public double getGMPOV() {
-  //   return operator.getPOV();
-  // }
   
   /**
 	 * Turns on and off the rumble function on the driver and operator controllers
 	 * @param set true to turn on rumble
 	 */
-	public void setControllerRumble(boolean state) {
-		if (state == true) {
-			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kLeftRumble, 1);
-			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kRightRumble, 1);  
-			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kLeftRumble, 1);
-			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kRightRumble, 1);
+	public void setControllerRumble(boolean rumble) {
+		if (rumble) {
+			setRumble(driver, 1);
+			setRumble(operator, 1);
 		} else {
-			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kLeftRumble, 0);
-			getPatroller().get(DRIVER, DRIVER_PORT).setRumble(RumbleType.kRightRumble, 0);
-			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kLeftRumble, 0);
-			getPatroller().get(OPERATOR, OPERATOR_PORT).setRumble(RumbleType.kRightRumble, 0);
+			setRumble(driver, 0);
+			setRumble(operator, 0);
 		}
-	}
+  }
+  
+  private void setRumble(Joystick controller, int state) {
+    controller.setRumble(RumbleType.kLeftRumble, state);
+		controller.setRumble(RumbleType.kRightRumble, state);
+  }
 }

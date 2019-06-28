@@ -15,6 +15,7 @@ import com.team2363.commands.NormalizedArcadeDrive;
 import com.team2363.controller.PIDController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.drivetrain.NegInertiaCalc;
 
 /**
  * This command will check to see if there is no turn command being applied and will attempt to 
@@ -24,6 +25,8 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
   private PIDController controller = new PIDController(0.04, 0, 0.005, 0.02);
   private boolean holdingHeading;
+  
+  private NegInertiaCalc negativeInertiaCalculator = new NegInertiaCalc(5);
 
   public StraightAssistedDrive() {
     super(getDrivetrain());
@@ -40,11 +43,17 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     double turn =  getOI().getTurn();
     double turnPower = abs(turn);
     double currentHeading = getDrivetrain().getYaw();
+    double negativeInertia = negativeInertiaCalculator.calculate(turn);
 
     // Is the robot being commanded to turn? If yes then use that as the command and reset the hold heading
     if (turnPower > 0.05) {
       holdingHeading = false;
       return turn;
+    }
+
+    // Make sure to kill off any excess inertia before setting our heading, this will help with oscillation
+    if (negativeInertia != 0) {
+      return negativeInertia;
     }
 
     // Set the hold heading if this is the first time we see no turn command
