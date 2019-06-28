@@ -37,8 +37,11 @@ public class PathFollower extends Command {
     requires(getDrivetrain());
 
     importPath(pathName);
-    leftFollower.configurePIDVA(1.0, 0.0, 0.0, 1 / MAX_VELOCITY_IN_FPS, 0);
-    rightFollower.configurePIDVA(1.0, 0.0, 0.0, 1 / MAX_VELOCITY_IN_FPS, 0);
+    // leftFollower.configurePIDVA(4, 0.0, 0.01, 1 / MAX_VELOCITY_IN_FPS, 0);
+    // rightFollower.configurePIDVA(4, 0.0, 0.01, 1 / MAX_VELOCITY_IN_FPS, 0);
+
+    leftFollower.configurePIDVA(1, 0.0, 0.0000000, 1.3 / MAX_VELOCITY_IN_FPS, 0);
+    rightFollower.configurePIDVA(1, 0.0, 0.0000000, 1.3 / MAX_VELOCITY_IN_FPS, 0);
   }
 
   @Override
@@ -46,6 +49,7 @@ public class PathFollower extends Command {
     // Set the starting positions of the left and right sides of the drivetrain
     leftStartingDistance = getDrivetrain().getLeftPosition();
     rightStartingDistance = getDrivetrain().getRightPosition();
+    
 
     //Make sure we're starting at the beginning of the path
     leftFollower.reset();

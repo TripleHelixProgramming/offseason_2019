@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
-  private PIDController controller = new PIDController(0, 0, 0, 0.02);
+  private PIDController controller = new PIDController(0.04, 0, 0.005, 0.02);
   private boolean holdingHeading;
 
   public StraightAssistedDrive() {
@@ -55,7 +55,7 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     }
 
     // Return the P controlled error as our turn value to keep our current heading
-    return controller.calculate(currentHeading);
+    return -controller.calculate(currentHeading);
   }
 
   @Override
@@ -68,5 +68,6 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     super.execute();
     SmartDashboard.putBoolean("Holding Heading", holdingHeading);
     SmartDashboard.putNumber("Hold Heading", controller.getReference());
+    SmartDashboard.putNumber("Current Heading", getDrivetrain().getYaw());
   }
 }

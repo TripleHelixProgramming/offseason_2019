@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.drivetrain.commands.JoshDrive;
+import frc.robot.drivetrain.commands.StraightAssistedDrive;
 
 /**
  * An example subsystem. You can replace me with your own Subsystem.
@@ -82,7 +83,7 @@ public class Drivetrain extends Subsystem {
 
   @Override
   public void initDefaultCommand() {
-    setDefaultCommand(new JoshDrive());
+    setDefaultCommand(new StraightAssistedDrive());
   }
 
   public void tankDrive(double leftPercent, double rightPercent) {
@@ -158,8 +159,7 @@ public class Drivetrain extends Subsystem {
     return  convertFromTicksToFeet(right.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
-  @Override
-  public void periodic() {
+  public void logToDashboard() {
     SmartDashboard.putNumber("Pigeon Yaw", getYaw());
     SmartDashboard.putNumber("Left Velocity", getLeftVelocity());
     SmartDashboard.putNumber("Right Velocity", getRightVelocity());
