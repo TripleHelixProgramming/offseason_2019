@@ -16,6 +16,7 @@ import com.team2363.controller.PIDController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.drivetrain.NegInertiaCalc;
+import frc.robot.oi.OI;
 
 /**
  * This command will check to see if there is no turn command being applied and will attempt to 
@@ -23,10 +24,11 @@ import frc.robot.drivetrain.NegInertiaCalc;
  */
 public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
-  private PIDController controller = new PIDController(0.04, 0, 0.005, 0.02);
+  private PIDController controller = new PIDController(0.03, 0, 0.005, 0.02);
+  // private PIDController controller = new PIDController(0, 0, 0, 0.02);
   private boolean holdingHeading;
   
-  private NegInertiaCalc negativeInertiaCalculator = new NegInertiaCalc(5);
+  private NegInertiaCalc negativeInertiaCalculator = new NegInertiaCalc(10);
 
   public StraightAssistedDrive() {
     super(getDrivetrain());
@@ -45,6 +47,8 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     double currentHeading = getDrivetrain().getYaw();
     double negativeInertia = negativeInertiaCalculator.calculate(turn);
 
+    SmartDashboard.putNumber("Negative Inertia", negativeInertia);
+
     // Is the robot being commanded to turn? If yes then use that as the command and reset the hold heading
     if (turnPower > 0.05) {
       holdingHeading = false;
@@ -52,7 +56,7 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     }
 
     // Make sure to kill off any excess inertia before setting our heading, this will help with oscillation
-    if (negativeInertia != 0) {
+    if (negativeInertia > 0.1) {
       return negativeInertia;
     }
 
@@ -78,5 +82,6 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     SmartDashboard.putBoolean("Holding Heading", holdingHeading);
     SmartDashboard.putNumber("Hold Heading", controller.getReference());
     SmartDashboard.putNumber("Current Heading", getDrivetrain().getYaw());
+    SmartDashboard.putNumber("Current Turn Command", getOI().getTurn());
   }
 }
