@@ -30,11 +30,14 @@ public class JoshDrive extends NormalizedArcadeDrive {
 
     @Override
     protected double getTurn() {
-        return OI.getOI().getTurn();
+        if (Math.abs(OI.getOI().getTurn()) < 0.05) {
+            return 0;
+        }
+        return OI.getOI().getTurn() * 0.5;
     }
 
     @Override
     protected void useOutputs(double left, double right) {
-        Drivetrain.getDrivetrain().tankDrive(left, right);
+        Drivetrain.getDrivetrain().setPercentOutput(left, right);
     }
 }

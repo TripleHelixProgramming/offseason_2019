@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.drivetrain.commands.PathFollower;
+import frc.robot.drivetrain.commands.VelocityTuning;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -83,7 +84,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     getDrivetrain().resetHeading();
-    autonomousCommand = new PathFollower("5_feet_forward");
+    // autonomousCommand = new PathFollower("5_feet_forward");
+    autonomousCommand = new VelocityTuning();
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.start();

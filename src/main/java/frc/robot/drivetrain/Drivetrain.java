@@ -8,10 +8,12 @@
 package frc.robot.drivetrain;
 
 import static com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput;
+import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
 import static frc.robot.drivetrain.HelixMath.convertFromTicksPer100MsToFps;
 import static frc.robot.drivetrain.HelixMath.convertFromTicksToFeet;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
@@ -43,8 +45,8 @@ public class Drivetrain extends Subsystem {
   }
 
   private final double WHEEL_DIAMETER_IN_INCHES = 4;
-  private final int ENCODER_TICKS_PER_REVOLUTION = 480;
-  public static final double MAX_VELOCITY_IN_FPS = 14;
+  private final int ENCODER_TICKS_PER_REVOLUTION = (int) (480 * 48.0/42.0);
+  public static final double MAX_VELOCITY_IN_FPS = 10;
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
 
@@ -54,8 +56,6 @@ public class Drivetrain extends Subsystem {
   private int LEFT_MASTER_ID = 23;
   private int LEFT_SLAVE_1_ID = 24;
   private int LEFT_SLAVE_2_ID = 25;
-
-  private int PIGEON_ID = 10;
 
   //  Competition & Practice Bot  Talon Masters with Victors as Slaves.
   private BaseMotorController rightSlave1 = new BobTalonSRX(RIGHT_SLAVE_1_ID);
@@ -84,19 +84,28 @@ public class Drivetrain extends Subsystem {
   @Override
   public void initDefaultCommand() {
     setDefaultCommand(new StraightAssistedDrive());
+    // setDefaultCommand(new JoshDrive());
   }
 
-  public void tankDrive(double leftPercent, double rightPercent) {
-    left.set(PercentOutput, leftPercent);
-    right.set(PercentOutput, rightPercent);
+  public void setPercentOutput(double leftPercent, double rightPercent) {
+    setVelocityOutput(leftPercent * MAX_VELOCITY_IN_FPS, rightPercent * MAX_VELOCITY_IN_FPS);
+  }
 
-    // left.set(Velocity, convertFromFpsToTicksPer10Ms(leftPercent * MAX_VELOCITY_IN_FPS));
-    // right.set(Velocity, convertFromFpsToTicksPer10Ms(rightPercent * MAX_VELOCITY_IN_FPS));
+  public void setVelocityOutput(double leftVelocity, double rightVelocity) {
+    left.set(Velocity, HelixMath.convertFromFpsToTicksPer100Ms(leftVelocity, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION));
+    right.set(Velocity, HelixMath.convertFromFpsToTicksPer100Ms(rightVelocity, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION));
   }
 
   private void setPIDFValues() {
-    left.configPIDF(VELOCITY_CONTROL_SLOT, 0, 0, 0, 0);
-    right.configPIDF(VELOCITY_CONTROL_SLOT, 0, 0, 0, 0);
+    double kF = 1.25;
+    double kP = 5;
+    double kI = 0.01;
+    double kD = 0;
+    left.configPIDF(VELOCITY_CONTROL_SLOT, kP, kI, kD, kF);
+    right.configPIDF(VELOCITY_CONTROL_SLOT, kP, kI, kD, kF);
+
+    left.config_IntegralZone(VELOCITY_CONTROL_SLOT, (int) HelixMath.convertFromFpsToTicksPer100Ms(1, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION));
+    right.config_IntegralZone(VELOCITY_CONTROL_SLOT, (int) HelixMath.convertFromFpsToTicksPer100Ms(1, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION));
   }
 
   private void setupSensors() {

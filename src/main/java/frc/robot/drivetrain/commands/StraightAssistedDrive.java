@@ -11,10 +11,13 @@ import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
 import static frc.robot.oi.OI.getOI;
 import static java.lang.Math.abs;
 
+import java.util.Date;
+
 import com.team2363.commands.NormalizedArcadeDrive;
 import com.team2363.controller.PIDController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RollingAverager;
 import frc.robot.drivetrain.NegInertiaCalc;
 import frc.robot.oi.OI;
 
@@ -24,11 +27,11 @@ import frc.robot.oi.OI;
  */
 public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
-  private PIDController controller = new PIDController(0.03, 0, 0.005, 0.02);
-  // private PIDController controller = new PIDController(0, 0, 0, 0.02);
+  private PIDController controller = new PIDController(0.001, 0, 0, 0.02);
   private boolean holdingHeading;
+  private Date turnTimeout;
   
-  private NegInertiaCalc negativeInertiaCalculator = new NegInertiaCalc(10);
+  private RollingAverager throttleAverage = new RollingAverager(20);
 
   public StraightAssistedDrive() {
     super(getDrivetrain());
@@ -37,7 +40,11 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
   @Override
   protected double getThrottle() {
-    return getOI().getThrottle();
+    double throttle = getOI().getThrottle();
+    if (Math.abs(throttle) < 0.05) {
+      throttle = 0;
+    }
+    return throttleAverage.getNewAverage(throttle);
   }
 
   @Override
@@ -45,23 +52,20 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     double turn =  getOI().getTurn();
     double turnPower = abs(turn);
     double currentHeading = getDrivetrain().getYaw();
-    double negativeInertia = negativeInertiaCalculator.calculate(turn);
-
-    SmartDashboard.putNumber("Negative Inertia", negativeInertia);
 
     // Is the robot being commanded to turn? If yes then use that as the command and reset the hold heading
     if (turnPower > 0.05) {
       holdingHeading = false;
+      turnTimeout = null;
       return turn;
     }
 
-    // Make sure to kill off any excess inertia before setting our heading, this will help with oscillation
-    if (negativeInertia > 0.1) {
-      return negativeInertia;
+    if (turnTimeout == null) {
+      turnTimeout = new Date();
     }
 
     // Set the hold heading if this is the first time we see no turn command
-    if (!holdingHeading) {
+    if (!holdingHeading && new Date().getTime() - turnTimeout.getTime() > 500) {
       holdingHeading = true;
       controller.reset();
       controller.setReference(currentHeading);
@@ -73,7 +77,7 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
   @Override
   protected void useOutputs(double left, double right) {
-    getDrivetrain().tankDrive(left, right);
+    getDrivetrain().setPercentOutput(left, right);
   }
 
   @Override

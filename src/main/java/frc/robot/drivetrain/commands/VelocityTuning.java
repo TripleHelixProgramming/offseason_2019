@@ -9,10 +9,12 @@ package frc.robot.drivetrain.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.drivetrain.Drivetrain;
-import frc.robot.oi.OI;
 
-public class SpeedTuner extends Command {
-  public SpeedTuner() {
+public class VelocityTuning extends Command {
+  public VelocityTuning() {
+
+    // Use requires() here to declare subsystem dependencies
+    // eg. requires(chassis);
     requires(Drivetrain.getDrivetrain());
   }
 
@@ -24,7 +26,7 @@ public class SpeedTuner extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivetrain.getDrivetrain().tankDrive(OI.getOI().getThrottle(), OI.getOI().getThrottle());
+    Drivetrain.getDrivetrain().setVelocityOutput(-2, -2);
   }
 
   // Make this return true when this Command no longer needs to run execute()

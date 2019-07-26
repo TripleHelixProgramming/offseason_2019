@@ -62,7 +62,7 @@ public class HelixMath {
      * @return the feet measurement converted to encoder ticks
      */
     public static double convertFromFeetToTicks(double feet, double wheelDiameterInInches, int ticksPerRevolution) {
-        return ticksPerRevolution * feet / (PI * wheelDiameterInInches);
+        return ticksPerRevolution * feet / (PI * wheelDiameterInInches) * 12;
     }
 
     /**
@@ -76,5 +76,10 @@ public class HelixMath {
      */
     public static double convertFromFpsToTicksPer100Ms(double fps, double wheelDiameterInInches, int ticksPerRevolution) {
         return convertFromFeetToTicks(fps / 10, wheelDiameterInInches, ticksPerRevolution);
+    }
+
+    public static void main(String... args) {
+        System.out.println(convertFromFpsToTicksPer100Ms(6, 4, (int)(480 * 48.0 / 42.0)));
+        System.out.println(convertFromTicksPer100MsToFps(313, 4, (int)(480 * 48.0 / 42.0)));
     }
 }

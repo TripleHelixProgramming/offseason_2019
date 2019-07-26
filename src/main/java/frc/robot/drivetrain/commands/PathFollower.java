@@ -109,6 +109,6 @@ public class PathFollower extends Command {
     double turn =  0.8 * (-1.0/80.0) * heading_difference;
 
     // Send the % outputs to the drivetrain
-    getDrivetrain().tankDrive(left_speed + turn, right_speed - turn);
+    getDrivetrain().setPercentOutput(left_speed + turn, right_speed - turn);
   }
 }
