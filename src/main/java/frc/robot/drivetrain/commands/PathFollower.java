@@ -7,108 +7,126 @@
 
 package frc.robot.drivetrain.commands;
 
-import static frc.robot.drivetrain.Drivetrain.MAX_VELOCITY_IN_FPS;
 import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
-import static jaci.pathfinder.Pathfinder.boundHalfDegrees;
-import static jaci.pathfinder.Pathfinder.r2d;
 
 import java.io.IOException;
+
+import com.team2363.controller.PIDController;
+import com.team2363.logger.HelixEvents;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
 import jaci.pathfinder.PathfinderFRC;
 import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.followers.DistanceFollower;
 
-public class PathFollower extends Command {
+public abstract class PathFollower extends Command {
+  // Used for correcting our travel distance error along the path
+  private PIDController distanceController = new PIDController(0, 0, 0);
 
-  private DistanceFollower leftFollower;
-  private DistanceFollower rightFollower;
+  // Used for correcting our heading error along the path
+  private PIDController directionController = new PIDController(0, 0, 0);
 
-  private Notifier notifier = new Notifier(this::followPath);
+  private Notifier pathNotifier = new Notifier(this::moveToNextSegment);
+  private Notifier pidNotifier = new Notifier(this::calculateOutputs);
 
-  // The starting positions of the left and right sides of the drivetrain
-  private double leftStartingDistance;
-  private double rightStartingDistance;
+  // The trajectories to follow for each side
+  private Trajectory leftTrajectory;
+  private Trajectory rightTrajectory;
 
-  private double period;
+  private int currentSegment;
+  private boolean isFinished;
 
+  /**
+   * This will import the path files based on the name of the path provided
+   * 
+   * @param pathName the name of the path to run
+   */
   public PathFollower(String pathName) {
     requires(getDrivetrain());
-
     importPath(pathName);
-    // leftFollower.configurePIDVA(4, 0.0, 0.01, 1 / MAX_VELOCITY_IN_FPS, 0);
-    // rightFollower.configurePIDVA(4, 0.0, 0.01, 1 / MAX_VELOCITY_IN_FPS, 0);
-
-    leftFollower.configurePIDVA(1, 0.0, 0.0000000, 1.3 / MAX_VELOCITY_IN_FPS, 0);
-    rightFollower.configurePIDVA(1, 0.0, 0.0000000, 1.3 / MAX_VELOCITY_IN_FPS, 0);
   }
 
   @Override
   protected void initialize() {
-    // Set the starting positions of the left and right sides of the drivetrain
-    leftStartingDistance = getDrivetrain().getLeftPosition();
-    rightStartingDistance = getDrivetrain().getRightPosition();
-    
-
     //Make sure we're starting at the beginning of the path
-    leftFollower.reset();
-    rightFollower.reset();
+    distanceController.reset();
+    directionController.reset();
+    currentSegment = 0;
+    isFinished = false;
 
     // Start running the path
-    notifier.startPeriodic(period);
+    pathNotifier.startPeriodic(leftTrajectory.get(0).dt);
+    pidNotifier.startPeriodic(distanceController.getPeriod());
+
+    // If there  was an issue with importing the paths then we should just finish this command instantly
+    if (leftTrajectory == null || rightTrajectory == null) {
+      HelixEvents.getInstance().addEvent("DRIVETRAIN", "There was an issue importing the path, ending the command instantly.");
+      isFinished = true;
+    }
   }
 
   @Override
   protected boolean isFinished() {
-    return leftFollower.isFinished() || rightFollower.isFinished();
+    return isFinished;
   }
 
   @Override
   protected void end() {
-    notifier.stop();
+    pathNotifier.stop();
+    pidNotifier.stop();
   }
 
   @Override
   protected void interrupted() {
-    notifier.stop();
+    end();
   }
 
   private void importPath(String pathName) {
     try {
       // Read the path files from the file system
-      Trajectory leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
-      Trajectory rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
-
-      // Set the two paths in the followers
-      leftFollower = new DistanceFollower(leftTrajectory);
-      rightFollower = new DistanceFollower(rightTrajectory);
-
-      period = leftTrajectory.get(0).dt;
-
+      leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
+      rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
     } catch (IOException e) {
 		  e.printStackTrace();
 	  }
   }
 
-  private void followPath() {
-    // If either of the followers have finished their paths we need to stop the notifier
-    if (leftFollower.isFinished() || rightFollower.isFinished()) {
-      notifier.stop();
+  private void moveToNextSegment() {
+    // Move to the next segment in the path
+    currentSegment++;
+
+    // Was that the last segment in our path?
+    if (currentSegment >= leftTrajectory.length()) {
+      isFinished = true;
+    }
+  }
+
+  private void calculateOutputs() {
+    // If we're finished there are no more segments to read from and we should return
+    if (isFinished) {
       return;
-    } 
-    
-    // Get the left and right power output from the distance calculator
-    double left_speed = leftFollower.calculate(getDrivetrain().getLeftPosition() - leftStartingDistance);
-    double right_speed = rightFollower.calculate(getDrivetrain().getRightPosition() - rightStartingDistance);
+    }
 
-    // Calculate any correction we need based on the current and desired heading
-    double heading = getDrivetrain().getYaw();
-    double desired_heading = r2d(leftFollower.getHeading());
-    double heading_difference = boundHalfDegrees(desired_heading - heading);
-    double turn =  0.8 * (-1.0/80.0) * heading_difference;
+    // Get our expected velocities based on the paths
+    double leftVelocity = leftTrajectory.get(currentSegment).velocity;
+    double rightVelocity = rightTrajectory.get(currentSegment).velocity;
 
-    // Send the % outputs to the drivetrain
-    getDrivetrain().setPercentOutput(left_speed + turn, right_speed - turn);
+    // Set our expected position to be the setpoint of our distance controller
+    // The position will be an average of both the left and right to give us the overall distance
+    double expectedPosition = (leftTrajectory.get(currentSegment).position + rightTrajectory.get(currentSegment).position) / 2.0;
+    distanceController.setReference(expectedPosition);
+    double currentPosition = (getDrivetrain().getLeftPosition() + getDrivetrain().getRightPosition()) / 2.0;
+
+    // Set our expected heading to be the setpoint of our direction controller
+    double expectedHeading = leftTrajectory.get(currentSegment).heading;
+    distanceController.setReference(expectedHeading);
+    double currentHeading = getDrivetrain().getHeading();
+
+    // The final velocity is going to be a combination of our expected velocity corrected by our distance error and our heading error
+    // velocity = expected + distanceError +/ headingError
+    double correctedLeftVelocity = leftVelocity + distanceController.calculate(currentPosition) + directionController.calculate(currentHeading);
+    double correctedRightVelocity = rightVelocity + distanceController.calculate(currentPosition) - directionController.calculate(currentHeading);
+
+    getDrivetrain().setVelocityOutput(correctedLeftVelocity, correctedRightVelocity);
   }
 }

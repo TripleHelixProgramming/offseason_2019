@@ -7,13 +7,11 @@
 
 package frc.robot.drivetrain;
 
-import static com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput;
 import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
 import static frc.robot.drivetrain.HelixMath.convertFromTicksPer100MsToFps;
 import static frc.robot.drivetrain.HelixMath.convertFromTicksToFeet;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
@@ -24,7 +22,6 @@ import com.team319.models.LeaderBobTalonSRX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.drivetrain.commands.JoshDrive;
 import frc.robot.drivetrain.commands.StraightAssistedDrive;
 
 /**
@@ -146,7 +143,7 @@ public class Drivetrain extends Subsystem {
     pigeon.setYaw(0.0);
   }
 
-  public double getYaw() {
+  public double getHeading() {
     double [] ypr = {0, 0, 0};
     pigeon.getYawPitchRoll(ypr);
     return ypr[0];
@@ -169,7 +166,7 @@ public class Drivetrain extends Subsystem {
   }
 
   public void logToDashboard() {
-    SmartDashboard.putNumber("Pigeon Yaw", getYaw());
+    SmartDashboard.putNumber("Pigeon Yaw", getHeading());
     SmartDashboard.putNumber("Left Velocity", getLeftVelocity());
     SmartDashboard.putNumber("Right Velocity", getRightVelocity());
     SmartDashboard.putNumber("Left Distance", getLeftPosition());

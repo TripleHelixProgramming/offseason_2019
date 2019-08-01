@@ -18,8 +18,6 @@ import com.team2363.controller.PIDController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RollingAverager;
-import frc.robot.drivetrain.NegInertiaCalc;
-import frc.robot.oi.OI;
 
 /**
  * This command will check to see if there is no turn command being applied and will attempt to 
@@ -51,7 +49,7 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
   protected double getTurn() {
     double turn =  getOI().getTurn();
     double turnPower = abs(turn);
-    double currentHeading = getDrivetrain().getYaw();
+    double currentHeading = getDrivetrain().getHeading();
 
     // Is the robot being commanded to turn? If yes then use that as the command and reset the hold heading
     if (turnPower > 0.05) {
@@ -64,8 +62,12 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
       turnTimeout = new Date();
     }
 
+    if (!holdingHeading && new Date().getTime() - turnTimeout.getTime() < 500) {
+      return 0;
+    }
+
     // Set the hold heading if this is the first time we see no turn command
-    if (!holdingHeading && new Date().getTime() - turnTimeout.getTime() > 500) {
+    if (!holdingHeading) {
       holdingHeading = true;
       controller.reset();
       controller.setReference(currentHeading);
@@ -85,7 +87,7 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
     super.execute();
     SmartDashboard.putBoolean("Holding Heading", holdingHeading);
     SmartDashboard.putNumber("Hold Heading", controller.getReference());
-    SmartDashboard.putNumber("Current Heading", getDrivetrain().getYaw());
+    SmartDashboard.putNumber("Current Heading", getDrivetrain().getHeading());
     SmartDashboard.putNumber("Current Turn Command", getOI().getTurn());
   }
 }
