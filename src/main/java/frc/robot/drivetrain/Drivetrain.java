@@ -22,6 +22,7 @@ import com.team319.models.LeaderBobTalonSRX;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.drivetrain.commands.JoshDrive;
 import frc.robot.drivetrain.commands.StraightAssistedDrive;
 
 /**
@@ -80,8 +81,8 @@ public class Drivetrain extends Subsystem {
 
   @Override
   public void initDefaultCommand() {
-    setDefaultCommand(new StraightAssistedDrive());
-    // setDefaultCommand(new JoshDrive());
+    // setDefaultCommand(new StraightAssistedDrive());
+    setDefaultCommand(new JoshDrive());
   }
 
   public void setPercentOutput(double leftPercent, double rightPercent) {

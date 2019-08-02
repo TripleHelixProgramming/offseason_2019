@@ -16,6 +16,7 @@ import com.team2363.logger.HelixLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.drivetrain.commands.PathFollower;
 import frc.robot.drivetrain.commands.VelocityTuning;
@@ -68,6 +69,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     Scheduler.getInstance().run();
+    SmartDashboard.putNumber("Current Heading", getDrivetrain().getHeading());
   }
 
   /**
@@ -85,7 +87,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     getDrivetrain().resetHeading();
     // autonomousCommand = new PathFollower("5_feet_forward");
-    autonomousCommand = new VelocityTuning();
+    autonomousCommand = new PathFollower("90 Degrees");
+    // autonomousCommand = new VelocityTuning();
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.start();

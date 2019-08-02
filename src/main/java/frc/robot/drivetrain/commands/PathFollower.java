@@ -16,15 +16,16 @@ import com.team2363.logger.HelixEvents;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import jaci.pathfinder.PathfinderFRC;
 import jaci.pathfinder.Trajectory;
 
-public abstract class PathFollower extends Command {
+public class PathFollower extends Command {
   // Used for correcting our travel distance error along the path
-  private PIDController distanceController = new PIDController(0, 0, 0);
+  private PIDController distanceController = new PIDController(0, 0, 0, 0.001);
 
   // Used for correcting our heading error along the path
-  private PIDController directionController = new PIDController(0, 0, 0);
+  private PIDController directionController = new PIDController(0.5, 0, 0, 0.001);
 
   private Notifier pathNotifier = new Notifier(this::moveToNextSegment);
   private Notifier pidNotifier = new Notifier(this::calculateOutputs);
@@ -66,6 +67,12 @@ public abstract class PathFollower extends Command {
   }
 
   @Override
+  protected void execute() {
+    SmartDashboard.putNumber("Distance Path Error", distanceController.getError());
+    SmartDashboard.putNumber("DIrection Path Error", directionController.getError());
+  }
+
+  @Override
   protected boolean isFinished() {
     return isFinished;
   }
@@ -84,8 +91,12 @@ public abstract class PathFollower extends Command {
   private void importPath(String pathName) {
     try {
       // Read the path files from the file system
-      leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
-      rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+     // leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
+     // rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+
+      // THIS IS BAD LIBRARY BROKEN!!!!!!!!!!!
+      leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+      rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
     } catch (IOException e) {
 		  e.printStackTrace();
 	  }
@@ -102,30 +113,31 @@ public abstract class PathFollower extends Command {
   }
 
   private void calculateOutputs() {
+    int segment = currentSegment;
     // If we're finished there are no more segments to read from and we should return
-    if (isFinished) {
+    if (segment >= leftTrajectory.length()) {
       return;
     }
 
     // Get our expected velocities based on the paths
-    double leftVelocity = leftTrajectory.get(currentSegment).velocity;
-    double rightVelocity = rightTrajectory.get(currentSegment).velocity;
+    double leftVelocity = leftTrajectory.get(segment).velocity;
+    double rightVelocity = rightTrajectory.get(segment).velocity;
 
     // Set our expected position to be the setpoint of our distance controller
     // The position will be an average of both the left and right to give us the overall distance
-    double expectedPosition = (leftTrajectory.get(currentSegment).position + rightTrajectory.get(currentSegment).position) / 2.0;
+    double expectedPosition = (leftTrajectory.get(segment).position + rightTrajectory.get(segment).position) / 2.0;
     distanceController.setReference(expectedPosition);
     double currentPosition = (getDrivetrain().getLeftPosition() + getDrivetrain().getRightPosition()) / 2.0;
 
     // Set our expected heading to be the setpoint of our direction controller
-    double expectedHeading = leftTrajectory.get(currentSegment).heading;
-    distanceController.setReference(expectedHeading);
+    double expectedHeading = -Math.toDegrees(leftTrajectory.get(segment).heading);
+    directionController.setReference(expectedHeading);
     double currentHeading = getDrivetrain().getHeading();
 
     // The final velocity is going to be a combination of our expected velocity corrected by our distance error and our heading error
     // velocity = expected + distanceError +/ headingError
-    double correctedLeftVelocity = leftVelocity + distanceController.calculate(currentPosition) + directionController.calculate(currentHeading);
-    double correctedRightVelocity = rightVelocity + distanceController.calculate(currentPosition) - directionController.calculate(currentHeading);
+    double correctedLeftVelocity = leftVelocity + distanceController.calculate(currentPosition) - directionController.calculate(currentHeading);
+    double correctedRightVelocity = rightVelocity + distanceController.calculate(currentPosition) + directionController.calculate(currentHeading);
 
     getDrivetrain().setVelocityOutput(correctedLeftVelocity, correctedRightVelocity);
   }
