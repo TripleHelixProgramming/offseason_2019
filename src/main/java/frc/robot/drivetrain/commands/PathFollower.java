@@ -22,10 +22,10 @@ import jaci.pathfinder.Trajectory;
 
 public class PathFollower extends Command {
   // Used for correcting our travel distance error along the path
-  private PIDController distanceController = new PIDController(0, 0, 0, 0.001);
+  private PIDController distanceController = new PIDController(6, 0, 0, 0.001);
 
   // Used for correcting our heading error along the path
-  private PIDController directionController = new PIDController(0.5, 0, 0, 0.001);
+  private PIDController headingController = new PIDController(0.5, 0, 0, 0.001);
 
   private Notifier pathNotifier = new Notifier(this::moveToNextSegment);
   private Notifier pidNotifier = new Notifier(this::calculateOutputs);
@@ -49,9 +49,10 @@ public class PathFollower extends Command {
 
   @Override
   protected void initialize() {
+    getDrivetrain().resetEncoders();
     //Make sure we're starting at the beginning of the path
     distanceController.reset();
-    directionController.reset();
+    headingController.reset();
     currentSegment = 0;
     isFinished = false;
 
@@ -69,7 +70,7 @@ public class PathFollower extends Command {
   @Override
   protected void execute() {
     SmartDashboard.putNumber("Distance Path Error", distanceController.getError());
-    SmartDashboard.putNumber("DIrection Path Error", directionController.getError());
+    SmartDashboard.putNumber("Heading Path Error", headingController.getError());
   }
 
   @Override
@@ -113,6 +114,8 @@ public class PathFollower extends Command {
   }
 
   private void calculateOutputs() {
+    // We need to get the current segment right away so it doesn't change in the middle
+    // of the calculations
     int segment = currentSegment;
     // If we're finished there are no more segments to read from and we should return
     if (segment >= leftTrajectory.length()) {
@@ -131,13 +134,13 @@ public class PathFollower extends Command {
 
     // Set our expected heading to be the setpoint of our direction controller
     double expectedHeading = -Math.toDegrees(leftTrajectory.get(segment).heading);
-    directionController.setReference(expectedHeading);
+    headingController.setReference(expectedHeading);
     double currentHeading = getDrivetrain().getHeading();
 
     // The final velocity is going to be a combination of our expected velocity corrected by our distance error and our heading error
-    // velocity = expected + distanceError +/ headingError
-    double correctedLeftVelocity = leftVelocity + distanceController.calculate(currentPosition) - directionController.calculate(currentHeading);
-    double correctedRightVelocity = rightVelocity + distanceController.calculate(currentPosition) + directionController.calculate(currentHeading);
+    // velocity = expected + distanceError +/- headingError
+    double correctedLeftVelocity = leftVelocity + distanceController.calculate(currentPosition) - headingController.calculate(currentHeading);
+    double correctedRightVelocity = rightVelocity + distanceController.calculate(currentPosition) + headingController.calculate(currentHeading);
 
     getDrivetrain().setVelocityOutput(correctedLeftVelocity, correctedRightVelocity);
   }

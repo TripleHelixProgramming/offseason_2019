@@ -86,8 +86,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     getDrivetrain().resetHeading();
-    // autonomousCommand = new PathFollower("5_feet_forward");
-    autonomousCommand = new PathFollower("90 Degrees");
+    autonomousCommand = new PathFollower("5_feet_forward");
+    // autonomousCommand = new PathFollower("90 Degrees");
     // autonomousCommand = new VelocityTuning();
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
