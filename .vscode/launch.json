@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - Camera",
+      "request": "launch",
+      "mainClass": "frc.robot.drivetrain.Camera",
+      "projectName": "offseason_2019"
+    },
+    {
+      "type": "java",
       "name": "CodeLens (Launch) - HelixMath",
       "request": "launch",
       "mainClass": "frc.robot.drivetrain.HelixMath",

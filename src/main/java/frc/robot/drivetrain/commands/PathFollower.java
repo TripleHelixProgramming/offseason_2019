@@ -33,6 +33,7 @@ public class PathFollower extends Command {
   // The trajectories to follow for each side
   private Trajectory leftTrajectory;
   private Trajectory rightTrajectory;
+  private boolean flip;
 
   private int currentSegment;
   private boolean isFinished;
@@ -43,8 +44,13 @@ public class PathFollower extends Command {
    * @param pathName the name of the path to run
    */
   public PathFollower(String pathName) {
+    this(pathName, false);
+  }
+
+  public PathFollower(String pathName, boolean flip) {
     requires(getDrivetrain());
-    importPath(pathName);
+    this.flip = !flip;
+    importPath(pathName, !flip);
   }
 
   @Override
@@ -89,15 +95,16 @@ public class PathFollower extends Command {
     end();
   }
 
-  private void importPath(String pathName) {
+  private void importPath(String pathName, boolean flip) {
     try {
-      // Read the path files from the file system
-     // leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
-     // rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+      if (flip) {
+        leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+        rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
+      } else {
+        leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
+        rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+      }
 
-      // THIS IS BAD LIBRARY BROKEN!!!!!!!!!!!
-      leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
-      rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
     } catch (IOException e) {
 		  e.printStackTrace();
 	  }
@@ -133,8 +140,9 @@ public class PathFollower extends Command {
     double currentPosition = (getDrivetrain().getLeftPosition() + getDrivetrain().getRightPosition()) / 2.0;
 
     // Set our expected heading to be the setpoint of our direction controller
-    double expectedHeading = -Math.toDegrees(leftTrajectory.get(segment).heading);
-    headingController.setReference(expectedHeading);
+    double expectedHeading = Math.toDegrees(leftTrajectory.get(segment).heading);
+    // If the path is flipped, invert the sign of the heading
+    headingController.setReference(flip ? -expectedHeading : expectedHeading);
     double currentHeading = getDrivetrain().getHeading();
 
     // The final velocity is going to be a combination of our expected velocity corrected by our distance error and our heading error

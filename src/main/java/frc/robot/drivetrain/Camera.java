@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Camera {
 
     private String name;
@@ -52,21 +54,29 @@ public class Camera {
         return getDefault().getTable(name).getEntry("ty").getDouble(0);
     }
 
+    public void getType() {
+        // SmartDashboard.putString("Type", "" + getDefault().getTable(name).getEntry("tcornx").getNumberArray(new Number [4])[0]);
+    }
+
     public double getTargetSkew() {
-        int[] xFromLimelight = {2, 6, 1, 7};
-        int[] yFromLimelight = {3, 1, 4, 8};
+        try {
+            Number[] xFromLimelight = getDefault().getTable(name).getEntry("tcornx").getNumberArray(new Number [4]);
+            Number[] yFromLimelight = getDefault().getTable(name).getEntry("tcorny").getNumberArray(new Number[4]);
+            
+            List<Coordinate> coordinates = new ArrayList<>();
+
+            for (int i = 0; i < xFromLimelight.length; i++) {
+                coordinates.add(new Coordinate(xFromLimelight[i].doubleValue(), yFromLimelight[i].doubleValue()));
+            }
+
+            coordinates = coordinates.stream().sorted((c1, c2) -> c1.y.compareTo(c2.y)).limit(4).collect(Collectors.toList());
+            Coordinate left = coordinates.stream().sorted((c1, c2) -> c1.x.compareTo(c2.x)).limit(1).collect(Collectors.toList()).get(0);
+            Coordinate right = coordinates.stream().sorted((c1, c2) -> c2.x.compareTo(c1.x)).limit(1).collect(Collectors.toList()).get(0);
         
-        List<Coordinate> coordinates = new ArrayList<>();
-
-        for (int i = 0; i < xFromLimelight.length; i++) {
-            coordinates.add(new Coordinate(xFromLimelight[i], yFromLimelight[i]));
+            return (double)(right.y - left.y) / (double)(right.x - left.x);
+        } catch (Exception e) {
+            return 0;
         }
-
-        coordinates = coordinates.stream().sorted((c1, c2) -> c1.y.compareTo(c2.y)).limit(4).collect(Collectors.toList());
-        Coordinate left = coordinates.stream().sorted((c1, c2) -> c1.x.compareTo(c2.x)).limit(1).collect(Collectors.toList()).get(0);
-        Coordinate right = coordinates.stream().sorted((c1, c2) -> c2.x.compareTo(c1.x)).limit(1).collect(Collectors.toList()).get(0);
-    
-        return (double)(right.y - left.y) / (double)(right.x - left.x);
     }
 
     public static void main(String... args) {
@@ -75,9 +85,9 @@ public class Camera {
     }
 
     private class Coordinate {
-        private Integer x, y;
+        private Double x, y;
 
-        public Coordinate(int x, int y) {
+        public Coordinate(double x, double y) {
             this.x = x;
             this.y = y;
         }

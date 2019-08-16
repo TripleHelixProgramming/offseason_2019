@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.drivetrain.Camera;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.drivetrain.commands.PathFollower;
 import frc.robot.drivetrain.commands.VelocityTuning;
@@ -30,6 +31,7 @@ import frc.robot.drivetrain.commands.VelocityTuning;
  */
 public class Robot extends TimedRobot {
   Command autonomousCommand;
+  Camera camera = new Camera("limelight-front");
 
   /**
    * This function is run when the robot is first started up and should be
@@ -70,6 +72,8 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     Scheduler.getInstance().run();
     SmartDashboard.putNumber("Current Heading", getDrivetrain().getHeading());
+    SmartDashboard.putNumber("Target Slope", camera.getTargetSkew());
+    camera.getType();
   }
 
   /**
@@ -86,8 +90,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     getDrivetrain().resetHeading();
-    autonomousCommand = new PathFollower("5_feet_forward");
-    // autonomousCommand = new PathFollower("90 Degrees");
+    // autonomousCommand = new PathFollower("5_feet_forward");
+    autonomousCommand = new PathFollower("90 Degrees", true);
     // autonomousCommand = new VelocityTuning();
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
