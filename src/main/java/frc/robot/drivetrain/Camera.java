@@ -54,29 +54,16 @@ public class Camera {
         return getDefault().getTable(name).getEntry("ty").getDouble(0);
     }
 
+    public double getAreaOfTarget() {
+        return getDefault().getTable(name).getEntry("ta").getDouble(0);
+    }
+
     public void getType() {
         // SmartDashboard.putString("Type", "" + getDefault().getTable(name).getEntry("tcornx").getNumberArray(new Number [4])[0]);
     }
 
     public double getTargetSkew() {
-        try {
-            Number[] xFromLimelight = getDefault().getTable(name).getEntry("tcornx").getNumberArray(new Number [4]);
-            Number[] yFromLimelight = getDefault().getTable(name).getEntry("tcorny").getNumberArray(new Number[4]);
-            
-            List<Coordinate> coordinates = new ArrayList<>();
-
-            for (int i = 0; i < xFromLimelight.length; i++) {
-                coordinates.add(new Coordinate(xFromLimelight[i].doubleValue(), yFromLimelight[i].doubleValue()));
-            }
-
-            coordinates = coordinates.stream().sorted((c1, c2) -> c1.y.compareTo(c2.y)).limit(4).collect(Collectors.toList());
-            Coordinate left = coordinates.stream().sorted((c1, c2) -> c1.x.compareTo(c2.x)).limit(1).collect(Collectors.toList()).get(0);
-            Coordinate right = coordinates.stream().sorted((c1, c2) -> c2.x.compareTo(c1.x)).limit(1).collect(Collectors.toList()).get(0);
-        
-            return (double)(right.y - left.y) / (double)(right.x - left.x);
-        } catch (Exception e) {
-            return 0;
-        }
+        return getVerticalDegreesToTarget() / (getAreaOfTarget() - Math.abs(getRotationalDegreesToTarget() * 0.01));
     }
 
     public static void main(String... args) {
@@ -92,4 +79,6 @@ public class Camera {
             this.y = y;
         }
     }
+
+
 }

@@ -66,6 +66,7 @@ public class Drivetrain extends Subsystem {
 
   private PowerDistributionPanel pdp = new PowerDistributionPanel();
   private PigeonIMU pigeon = new PigeonIMU(rightSlave2);
+  private Camera frontCamera = new Camera("limelight-front");
 
   private Drivetrain() {
     setPIDFValues();
@@ -164,6 +165,10 @@ public class Drivetrain extends Subsystem {
 
   public double getRightPosition() {
     return  convertFromTicksToFeet(right.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
+  }
+
+  public Camera getFrontCamera() {
+    return frontCamera;
   }
 
   public void logToDashboard() {
