@@ -9,7 +9,7 @@ package frc.robot.oi;
 
 import static com.team2363.utilities.ControllerMap.X_BOX_LEFT_STICK_Y;
 import static com.team2363.utilities.ControllerMap.X_BOX_RIGHT_STICK_X;
-import static frc.robot.ControllerPatroller.getPatroller;
+import static com.team2363.utilities.ControllerPatroller.getPatroller;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;

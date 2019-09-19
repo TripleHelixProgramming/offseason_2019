@@ -9,8 +9,6 @@ package frc.robot.drivetrain;
 
 import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
-import static frc.robot.drivetrain.HelixMath.convertFromTicksPer100MsToFps;
-import static frc.robot.drivetrain.HelixMath.convertFromTicksToFeet;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -18,6 +16,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.team319.models.BobTalonSRX;
 import com.team319.models.LeaderBobTalonSRX;
+import com.team2363.utilities.HelixMath;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -152,19 +151,19 @@ public class Drivetrain extends Subsystem {
   }
 
   public double getLeftVelocity() {
-      return convertFromTicksPer100MsToFps(left.getSelectedSensorVelocity(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
+      return HelixMath.convertFromTicksPer100MsToFps(left.getSelectedSensorVelocity(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   public double getRightVelocity() {
-    return convertFromTicksPer100MsToFps(right.getSelectedSensorVelocity(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
+    return HelixMath.convertFromTicksPer100MsToFps(right.getSelectedSensorVelocity(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   public double getLeftPosition() {
-    return convertFromTicksToFeet(left.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
+    return HelixMath.convertFromTicksToFeet(left.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   public double getRightPosition() {
-    return  convertFromTicksToFeet(right.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
+    return  HelixMath.convertFromTicksToFeet(right.getSelectedSensorPosition(), WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION);
   }
 
   public Camera getFrontCamera() {

@@ -15,9 +15,9 @@ import java.util.Date;
 
 import com.team2363.commands.NormalizedArcadeDrive;
 import com.team2363.controller.PIDController;
+import com.team2363.utilities.RollingAverager;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.RollingAverager;
 
 /**
  * This command will check to see if there is no turn command being applied and will attempt to 
