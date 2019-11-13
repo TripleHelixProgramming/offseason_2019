@@ -17,7 +17,7 @@ public class PathFollower extends HelixFollower {
     private Drivetrain drivetrain = Drivetrain.getDrivetrain();
 
     private PIDController headingController = new PIDController(15, 0, 0, 0.001);
-    private PIDController distanceController = new PIDController(6, 0, 0, 0.001);
+    private PIDController distanceController = new PIDController(10, 0, 0, 0.001);
 
     public PathFollower(Path path) {
         super(path);
@@ -51,6 +51,6 @@ public class PathFollower extends HelixFollower {
 
     @Override
     public void useOutputs(double left, double right) {
-        drivetrain.setVelocityOutput(left, right);
+        drivetrain.setRawPercentOutput(left/12.0, right/12.0);
 	}
 }
