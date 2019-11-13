@@ -52,6 +52,6 @@ public class PathFollower extends HelixFollower {
 
     @Override
     public void useOutputs(double left, double right) {
-        drivetrain.setRawPercentOutput(left/12.0, right/12.0);
+        drivetrain.setVelocityOutput(left, right);
 	}
 }
