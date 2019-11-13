@@ -56,6 +56,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile 'com.github.TripleHelixProgramming:HelixUtilities:master-SNAPSHOT'
+    compile 'com.github.Team319:BobTrajectory:master-SNAPSHOT'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')

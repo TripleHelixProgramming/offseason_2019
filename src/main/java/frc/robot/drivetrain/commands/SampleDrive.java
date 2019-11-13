@@ -7,25 +7,27 @@
 
 package frc.robot.drivetrain.commands;
 
-import com.team2363.commands.NormalizedArcadeDrive;
+import com.team2363.commands.HelixDrive;
+import com.team2363.utilities.RollingAverager;
 
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.oi.OI;
 
-/**
- * Add your docs here.
- */
-public class JoshDrive extends NormalizedArcadeDrive {
+public class SampleDrive extends HelixDrive {
 
-    private static double THROTTLE_SCALAR = 1;
+    private RollingAverager throttle = new RollingAverager(7);
 
-    public JoshDrive() {
-        super(Drivetrain.getDrivetrain());
+    public SampleDrive() {
+        requires(Drivetrain.getDrivetrain());
     }
 
     @Override
     protected double getThrottle() {
-        return OI.getOI().getThrottle() * THROTTLE_SCALAR;
+        double newThrottle = OI.getOI().getThrottle();
+        if (Math.abs(newThrottle) < 0.05) {
+            newThrottle = 0;
+        }
+        return throttle.getNewAverage(newThrottle);
     }
 
     @Override

@@ -17,12 +17,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.paths.RightTurn;
+import frc.paths.TwoFeetForward;
 import frc.robot.drivetrain.Camera;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.drivetrain.commands.AutoVisionDriving;
-import frc.robot.drivetrain.commands.ManualVisionDriving;
 import frc.robot.drivetrain.commands.PathFollower;
-import frc.robot.drivetrain.commands.VelocityTuning;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -32,7 +32,7 @@ import frc.robot.drivetrain.commands.VelocityTuning;
  * project.
  */
 public class Robot extends TimedRobot {
-  AutoVisionDriving autonomousCommand;
+  Command autonomousCommand;
   Camera camera = new Camera("limelight-front");
 
   /**
@@ -91,9 +91,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     getDrivetrain().resetHeading();
-    // autonomousCommand = new PathFollower("5_feet_forward");
+    autonomousCommand = new PathFollower(new RightTurn());
     // autonomousCommand = new PathFollower("90 Degrees", true);
-    autonomousCommand = new AutoVisionDriving();
+    // autonomousCommand = new AutoVisionDriving();
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.start();

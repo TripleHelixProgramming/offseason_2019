@@ -10,6 +10,7 @@ package frc.robot.drivetrain;
 import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
@@ -21,8 +22,7 @@ import com.team2363.utilities.HelixMath;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.drivetrain.commands.JoshDrive;
-import frc.robot.drivetrain.commands.StraightAssistedDrive;
+import frc.robot.drivetrain.commands.SampleDrive;
 
 /**
  * An example subsystem. You can replace me with your own Subsystem.
@@ -42,7 +42,7 @@ public class Drivetrain extends Subsystem {
   }
 
   private final double WHEEL_DIAMETER_IN_INCHES = 4;
-  private final int ENCODER_TICKS_PER_REVOLUTION = (int) (480 * 48.0/42.0);
+  private final int ENCODER_TICKS_PER_REVOLUTION = (int) (480 * 42.0/48.0);
   public static final double MAX_VELOCITY_IN_FPS = 10;
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
@@ -81,8 +81,12 @@ public class Drivetrain extends Subsystem {
 
   @Override
   public void initDefaultCommand() {
-    // setDefaultCommand(new StraightAssistedDrive());
-    setDefaultCommand(new JoshDrive());
+    setDefaultCommand(new SampleDrive());
+  }
+
+  public void setRawPercentOutput(double leftPercent, double rightPercent) {
+    left.set(ControlMode.PercentOutput, leftPercent);
+    right.set(ControlMode.PercentOutput, rightPercent);
   }
 
   public void setPercentOutput(double leftPercent, double rightPercent) {
