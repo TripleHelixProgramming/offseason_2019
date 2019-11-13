@@ -42,7 +42,7 @@ public class Drivetrain extends Subsystem {
   }
 
   private final double WHEEL_DIAMETER_IN_INCHES = 4;
-  private final int ENCODER_TICKS_PER_REVOLUTION = (int) (480 * 48.0/42.0);
+  private final int ENCODER_TICKS_PER_REVOLUTION = (int) (480 * 42.0/48.0);
   public static final double MAX_VELOCITY_IN_FPS = 10;
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
