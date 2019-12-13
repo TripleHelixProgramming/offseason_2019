@@ -8,9 +8,11 @@
 package frc.robot.drivetrain.commands;
 
 import com.team2363.controller.PIDController;
+import com.team2363.logger.HelixEvents;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
+import frc.robot.drivetrain.Drivetrain;
 
 import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
 
@@ -30,6 +32,7 @@ public abstract class AbstractVisionDriving extends Command {
   @Override
   protected void initialize() {
     notifier.startPeriodic(0.001);
+    Drivetrain.getDrivetrain().getFrontCamera().setDockingMode();
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -48,12 +51,15 @@ public abstract class AbstractVisionDriving extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
+    notifier.stop();
+    HelixEvents.getInstance().addEvent("DRIVETRAIN", "Stopping Vision Driving");
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
+    end();
   }
 
   private void calculate() {

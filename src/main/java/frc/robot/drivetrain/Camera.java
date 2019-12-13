@@ -9,12 +9,6 @@ package frc.robot.drivetrain;
 
 import static edu.wpi.first.networktables.NetworkTableInstance.getDefault;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class Camera {
 
     private String name;

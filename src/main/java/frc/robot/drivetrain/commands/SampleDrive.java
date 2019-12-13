@@ -22,6 +22,14 @@ public class SampleDrive extends HelixDrive {
     }
 
     @Override
+    protected void initialize() {
+        super.initialize();
+        for (int i = 0; i < 7; i++) {
+            throttle.getNewAverage(0);
+        }
+    }
+
+    @Override
     protected double getThrottle() {
         double newThrottle = OI.getOI().getThrottle();
         if (Math.abs(newThrottle) < 0.05) {

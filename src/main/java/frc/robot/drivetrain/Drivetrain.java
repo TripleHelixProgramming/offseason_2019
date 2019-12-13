@@ -81,7 +81,7 @@ public class Drivetrain extends Subsystem {
 
   @Override
   public void initDefaultCommand() {
-    setDefaultCommand(new SampleDrive());
+    // setDefaultCommand(new SampleDrive());
   }
 
   public void setRawPercentOutput(double leftPercent, double rightPercent) {
@@ -100,7 +100,7 @@ public class Drivetrain extends Subsystem {
 
   private void setPIDFValues() {
     double kF = 1.25;
-    double kP = 5;
+    double kP = 1; //5
     double kI = 0.01;
     double kD = 0;
     left.configPIDF(VELOCITY_CONTROL_SLOT, kP, kI, kD, kF);
@@ -174,7 +174,8 @@ public class Drivetrain extends Subsystem {
     return frontCamera;
   }
 
-  public void logToDashboard() {
+  @Override
+  public void periodic() {
     SmartDashboard.putNumber("Pigeon Yaw", getHeading());
     SmartDashboard.putNumber("Left Velocity", getLeftVelocity());
     SmartDashboard.putNumber("Right Velocity", getRightVelocity());

@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
   public void robotInit() { 
     initializeSubsystems();
     getDrivetrain().resetHeading();
+    HelixEvents.getInstance().startLogging();
   }
 
   private void initializeSubsystems() {
@@ -98,7 +99,6 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.start();
     }
-    HelixEvents.getInstance().startLogging();
   }
 
   /**
@@ -108,7 +108,6 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     Scheduler.getInstance().run();
     HelixLogger.getInstance().saveLogs();
-    Drivetrain.getDrivetrain().logToDashboard();
   }
 
   @Override
