@@ -9,15 +9,28 @@ package frc.robot.drivetrain;
 
 import static edu.wpi.first.networktables.NetworkTableInstance.getDefault;
 
+import edu.wpi.first.wpilibj.Preferences;
+
 public class Camera {
 
     private String name;
+    private double cameraAlignment;
 
     public Camera(String name) {
         this.name = name;
+        cameraAlignment = Preferences.getInstance().getDouble(name + "-alignment", 0);
     }
 
-    public void setToCameraMode() {
+    public double getCameraAlignment() {
+        return cameraAlignment;
+    }
+
+    public void setCameraAlignment(double cameraAlignment) {
+        this.cameraAlignment = cameraAlignment;
+        Preferences.getInstance().putDouble(name + "-alignment", cameraAlignment);
+    }
+
+    public void setToMode() {
         getDefault().getTable(name).getEntry("pipeline").setNumber(0);
     }
     
@@ -38,6 +51,10 @@ public class Camera {
     public boolean isTargetFound() {
         double v = getDefault().getTable(name).getEntry("tx").getDouble(0);
         return v != 0;
+    }
+
+    public boolean isTargetClose() {
+        return getVerticalDegreesToTarget() > getCameraAlignment();
     }
 
     public double getRotationalDegreesToTarget() {
@@ -64,15 +81,4 @@ public class Camera {
         Camera camera = new Camera("x");
         System.out.println(camera.getTargetSkew());
     }
-
-    private class Coordinate {
-        private Double x, y;
-
-        public Coordinate(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-
 }

@@ -7,56 +7,51 @@
 
 package frc.robot.drivetrain.commands;
 
+import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
+
 import com.team2363.controller.PIDController;
 import com.team2363.logger.HelixEvents;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
-import frc.robot.drivetrain.Drivetrain;
-
-import static frc.robot.drivetrain.Drivetrain.getDrivetrain;
+import frc.robot.drivetrain.Camera;
 
 public abstract class AbstractVisionDriving extends Command {
 
   private PIDController controller = new PIDController(0.05, 0, 0);
   private Notifier notifier = new Notifier(this::calculate);
+  private Camera camera;
 
   public AbstractVisionDriving() {
-    // Use requires() here to declare subsystem dependencies
     requires(getDrivetrain());
+    camera = getDrivetrain().getFrontCamera();
   }
 
   public abstract double getThrottle();
 
-  // Called just before this Command runs the first time
   @Override
   protected void initialize() {
     notifier.startPeriodic(0.001);
-    Drivetrain.getDrivetrain().getFrontCamera().setDockingMode();
+    camera.setDockingMode();
   }
 
-  // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    double angleToTarget = getDrivetrain().getFrontCamera().getRotationalDegreesToTarget();
+    double angleToTarget = camera.getRotationalDegreesToTarget();
     controller.setReference(getDrivetrain().getHeading() + angleToTarget);
   }
 
-  // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
     return false;
   }
 
-  // Called once after isFinished returns true
   @Override
   protected void end() {
     notifier.stop();
     HelixEvents.getInstance().addEvent("DRIVETRAIN", "Stopping Vision Driving");
   }
 
-  // Called when another command which requires one or more of the same
-  // subsystems is scheduled to run
   @Override
   protected void interrupted() {
     end();

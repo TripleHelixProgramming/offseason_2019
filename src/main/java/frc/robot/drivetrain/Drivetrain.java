@@ -15,18 +15,13 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.team2363.utilities.HelixMath;
 import com.team319.models.BobTalonSRX;
 import com.team319.models.LeaderBobTalonSRX;
-import com.team2363.utilities.HelixMath;
 
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.drivetrain.commands.SampleDrive;
 
-/**
- * An example subsystem. You can replace me with your own Subsystem.
- */
 public class Drivetrain extends Subsystem {
 
   private static Drivetrain INSTANCE = new Drivetrain();
@@ -47,23 +42,16 @@ public class Drivetrain extends Subsystem {
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
 
-  private int RIGHT_MASTER_ID = 12;
-  private int RIGHT_SLAVE_1_ID = 11;
-  private int RIGHT_SLAVE_2_ID = 10;
-  private int LEFT_MASTER_ID = 23;
-  private int LEFT_SLAVE_1_ID = 24;
-  private int LEFT_SLAVE_2_ID = 25;
-
   //  Competition & Practice Bot  Talon Masters with Victors as Slaves.
-  private BaseMotorController rightSlave1 = new BobTalonSRX(RIGHT_SLAVE_1_ID);
-  private BobTalonSRX rightSlave2 = new BobTalonSRX(RIGHT_SLAVE_2_ID);
-  private BaseMotorController leftSlave1 = new BobTalonSRX(LEFT_SLAVE_1_ID);
-  private BaseMotorController leftSlave2 = new BobTalonSRX(LEFT_SLAVE_2_ID);
+  private BaseMotorController rightSlave1 = new BobTalonSRX(11);
+  private BobTalonSRX rightSlave2 = new BobTalonSRX(10);
+  private BaseMotorController leftSlave1 = new BobTalonSRX(24);
+  private BaseMotorController leftSlave2 = new BobTalonSRX(25);
 
-  private LeaderBobTalonSRX left = new LeaderBobTalonSRX(LEFT_MASTER_ID, leftSlave1, leftSlave2);
-  private LeaderBobTalonSRX right = new LeaderBobTalonSRX(RIGHT_MASTER_ID, rightSlave1, rightSlave2);
+  private LeaderBobTalonSRX left = new LeaderBobTalonSRX(23, leftSlave1, leftSlave2);
+  private LeaderBobTalonSRX right = new LeaderBobTalonSRX(12, rightSlave1, rightSlave2);
 
-  private PowerDistributionPanel pdp = new PowerDistributionPanel();
+  //private PowerDistributionPanel pdp = new PowerDistributionPanel();
   private PigeonIMU pigeon = new PigeonIMU(rightSlave2);
   private Camera frontCamera = new Camera("limelight-front");
 

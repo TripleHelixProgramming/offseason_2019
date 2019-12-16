@@ -7,21 +7,16 @@
 
 package frc.robot.drivetrain.commands;
 
-import com.team2363.logger.HelixEvents;
-
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.InstantCommand;
+import frc.robot.drivetrain.Camera;
 import frc.robot.drivetrain.Drivetrain;
 
-public class WaitForTarget extends Command {
+public class SetFrontCameraAlignment extends InstantCommand {
 
   @Override
-  protected boolean isFinished() {
-    return Drivetrain.getDrivetrain().getFrontCamera().isTargetFound() 
-      && Drivetrain.getDrivetrain().getFrontCamera().isTargetClose();
-  }
-
-  @Override
-  protected void end() {
-    HelixEvents.getInstance().addEvent("Camera", "Found target");
+  protected void initialize() {
+    Camera camera = Drivetrain.getDrivetrain().getFrontCamera();
+    double cameraAlignment = camera.getVerticalDegreesToTarget();
+    camera.setCameraAlignment(cameraAlignment);
   }
 }

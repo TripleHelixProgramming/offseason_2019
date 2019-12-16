@@ -23,6 +23,7 @@ import frc.robot.drivetrain.Camera;
 import frc.robot.drivetrain.Drivetrain;
 import frc.robot.drivetrain.commands.AutoVisionDriving;
 import frc.robot.drivetrain.commands.PathFollower;
+import frc.robot.drivetrain.commands.SetFrontCameraAlignment;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -44,6 +45,7 @@ public class Robot extends TimedRobot {
     initializeSubsystems();
     getDrivetrain().resetHeading();
     HelixEvents.getInstance().startLogging();
+    SmartDashboard.putData(new SetFrontCameraAlignment());
   }
 
   private void initializeSubsystems() {
