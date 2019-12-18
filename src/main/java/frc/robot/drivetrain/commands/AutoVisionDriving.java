@@ -9,20 +9,43 @@ package frc.robot.drivetrain.commands;
 
 import frc.robot.drivetrain.Drivetrain;
 
-/**
- * Add your docs here.
- */
 public class AutoVisionDriving extends AbstractVisionDriving {
+
+    private double cruisingVelocity;
+    private double acceleration;
+    private double currentVelocity;
+    private Drivetrain drivetrain = Drivetrain.getDrivetrain();
+
+    public AutoVisionDriving(double cruisingVelocity, double acceleration) {
+        super();
+        this.cruisingVelocity = cruisingVelocity;
+        this.acceleration = acceleration *= 0.2;
+    }
+
+    @Override
+    protected void initialize() {
+        super.initialize();
+        currentVelocity = (drivetrain.getLeftVelocity() + drivetrain.getRightVelocity()) / 2.0;
+
+        if (currentVelocity < 0) {
+            acceleration *= -1;
+        }
+    }
 
     @Override
     public double getThrottle() {
-        double distanceToTarget = -(Drivetrain.getDrivetrain().getFrontCamera().getVerticalDegreesToTarget() + 9.7);
-        double speed = distanceToTarget * 0.4;
-        if (speed > 3) {
-            return 3;
+        // Slow down/speed up to cruise velocity
+        double velocityError = currentVelocity - cruisingVelocity;
+        if (velocityError == 0) {
+            return cruisingVelocity;
+        } else if (Math.abs(velocityError) < acceleration) {
+            currentVelocity = cruisingVelocity;
+            return cruisingVelocity;
+        } else if (currentVelocity < cruisingVelocity) {
+            currentVelocity += acceleration;
+        } else {
+            currentVelocity -= acceleration;
         }
-        return speed;
+        return currentVelocity;
       }
-
-    
 }
