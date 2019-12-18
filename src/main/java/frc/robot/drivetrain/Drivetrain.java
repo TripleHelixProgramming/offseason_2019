@@ -72,18 +72,54 @@ public class Drivetrain extends Subsystem {
     // setDefaultCommand(new SampleDrive());
   }
 
-  public void setRawPercentOutput(double leftPercent, double rightPercent) {
+  // private void setRawPercentOutput(double leftPercent, double rightPercent) {
+  //   left.set(ControlMode.PercentOutput, leftPercent);
+  //   right.set(ControlMode.PercentOutput, rightPercent);
+  // }
+
+  // private void setPercentOutput(double leftPercent, double rightPercent) {
+  //   setVelocityOutput(leftPercent * MAX_VELOCITY_IN_FPS, rightPercent * MAX_VELOCITY_IN_FPS);
+  // }
+
+  private void setVelocityOutput(double leftVelocity, double rightVelocity) {
+    left.set(Velocity, leftVelocity);
+    right.set(Velocity, rightVelocity);
+  }
+
+  private void setPowerOutput(double leftPercent, double rightPercent) {
     left.set(ControlMode.PercentOutput, leftPercent);
     right.set(ControlMode.PercentOutput, rightPercent);
   }
 
-  public void setPercentOutput(double leftPercent, double rightPercent) {
-    setVelocityOutput(leftPercent * MAX_VELOCITY_IN_FPS, rightPercent * MAX_VELOCITY_IN_FPS);
+  public enum CommandType {
+    PERCENT, FPS, TICKSPER100MS
   }
 
-  public void setVelocityOutput(double leftVelocity, double rightVelocity) {
-    left.set(Velocity, HelixMath.convertFromFpsToTicksPer100Ms(leftVelocity, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION));
-    right.set(Velocity, HelixMath.convertFromFpsToTicksPer100Ms(rightVelocity, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION));
+  public enum ControlType {
+    POWER, VELOCITY
+  }
+
+  public void setSetpoint(CommandType commandType, ControlType controlType, double left, double right) {
+    if (commandType == CommandType.PERCENT && controlType == ControlType.POWER) {
+      setPowerOutput(left, right);
+    }
+    else if (commandType == CommandType.PERCENT && controlType == ControlType.VELOCITY) {
+      setVelocityOutput(
+        HelixMath.convertFromFpsToTicksPer100Ms(left * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
+        HelixMath.convertFromFpsToTicksPer100Ms(right * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
+        );
+    }
+    else if (commandType == CommandType.FPS && controlType == ControlType.VELOCITY) {
+      setVelocityOutput(HelixMath.convertFromFpsToTicksPer100Ms(left, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
+        HelixMath.convertFromFpsToTicksPer100Ms(right, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
+        );
+    }
+    else if (commandType == CommandType.TICKSPER100MS && controlType == ControlType.VELOCITY) {
+      setVelocityOutput(left, right);
+    }
+    else {
+      setPowerOutput(left, right);
+    }
   }
 
   private void setPIDFValues() {

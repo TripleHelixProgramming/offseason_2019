@@ -18,6 +18,8 @@ import com.team2363.controller.PIDController;
 import com.team2363.utilities.RollingAverager;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.drivetrain.Drivetrain.CommandType;
+import frc.robot.drivetrain.Drivetrain.ControlType;
 
 /**
  * This command will check to see if there is no turn command being applied and will attempt to 
@@ -79,7 +81,7 @@ public class StraightAssistedDrive extends NormalizedArcadeDrive {
 
   @Override
   protected void useOutputs(double left, double right) {
-    getDrivetrain().setPercentOutput(left, right);
+    getDrivetrain().setSetpoint(CommandType.PERCENT, ControlType.VELOCITY, left, right);
   }
 
   @Override
