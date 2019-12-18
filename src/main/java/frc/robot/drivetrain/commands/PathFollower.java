@@ -12,6 +12,8 @@ import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
 
 import frc.robot.drivetrain.Drivetrain;
+import frc.robot.drivetrain.Drivetrain.CommandType;
+import frc.robot.drivetrain.Drivetrain.ControlType;
 
 public class PathFollower extends HelixFollower {
 
@@ -52,6 +54,6 @@ public class PathFollower extends HelixFollower {
 
     @Override
     public void useOutputs(double left, double right) {
-        drivetrain.setVelocityOutput(left, right);
+        drivetrain.setSetpoint(CommandType.FPS, ControlType.VELOCITY, left, right);
 	}
 }

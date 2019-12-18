@@ -11,6 +11,8 @@ import com.team2363.commands.HelixDrive;
 import com.team2363.utilities.RollingAverager;
 
 import frc.robot.drivetrain.Drivetrain;
+import frc.robot.drivetrain.Drivetrain.CommandType;
+import frc.robot.drivetrain.Drivetrain.ControlType;
 import frc.robot.oi.OI;
 
 public class SampleDrive extends HelixDrive {
@@ -48,6 +50,6 @@ public class SampleDrive extends HelixDrive {
 
     @Override
     protected void useOutputs(double left, double right) {
-        Drivetrain.getDrivetrain().setPercentOutput(left, right);
+        Drivetrain.getDrivetrain().setSetpoint(CommandType.PERCENT, ControlType.VELOCITY, left, right);
     }
 }
