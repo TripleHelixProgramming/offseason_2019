@@ -13,6 +13,9 @@ import static com.team2363.utilities.ControllerPatroller.getPatroller;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import frc.robot.drivetrain.commands.RampDown;
+import frc.robot.drivetrain.commands.VisionTakeOverGroup;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -40,7 +43,10 @@ public class OI {
   private Joystick driver = getPatroller().get(DRIVER, DRIVER_PORT);
   private Joystick operator = getPatroller().get(OPERATOR, OPERATOR_PORT);
 
-  private OI() { }
+  private OI() { 
+    new JoystickButton(driver, 3).whenPressed(new RampDown(3, 0));
+    new JoystickButton(driver, 2).whenPressed(new VisionTakeOverGroup());
+  }
 
   /**
    * @return the raw controller throttle

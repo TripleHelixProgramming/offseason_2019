@@ -55,7 +55,7 @@ dependencies {
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
     testCompile 'junit:junit:4.12'
 
-    compile 'com.github.TripleHelixProgramming:HelixUtilities:master-SNAPSHOT'
+    compile 'com.github.TripleHelixProgramming:HelixUtilities:2020-SNAPSHOT'
     compile 'com.github.Team319:BobTrajectory:master-SNAPSHOT'
 }
 
