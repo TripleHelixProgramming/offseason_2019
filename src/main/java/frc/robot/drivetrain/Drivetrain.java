@@ -36,12 +36,8 @@ public class Drivetrain extends Subsystem {
     return INSTANCE;
   }
 
-  public enum CommandType {
-    PERCENT, FPS, TICKSPER100MS
-  }
-
-  public enum ControlType {
-    POWER, VELOCITY
+  public enum CommandUnits {
+    PERCENT_FULLPOWER, PERCENT_FULLSPEED, FPS, TICKSPER100MS
   }
 
   private final double WHEEL_DIAMETER_IN_INCHES = 4;
@@ -90,19 +86,19 @@ public class Drivetrain extends Subsystem {
     right.set(ControlMode.PercentOutput, rightPercent);
   }
 
-  public void setSetpoint(CommandType commandType, ControlType controlType, double left, double right) {
-    if (commandType == CommandType.PERCENT && controlType == ControlType.POWER) {
+  public void setSetpoint(CommandUnits commandUnits, double left, double right) {
+    if (commandUnits == CommandUnits.PERCENT_FULLPOWER) {
       setPowerOutput(left, right);
-    } else if (commandType == CommandType.PERCENT && controlType == ControlType.VELOCITY) {
+    } else if (commandUnits == CommandUnits.PERCENT_FULLSPEED) {
       setVelocityOutput(
         HelixMath.convertFromFpsToTicksPer100Ms(left * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
         HelixMath.convertFromFpsToTicksPer100Ms(right * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
         );
-    } else if (commandType == CommandType.FPS && controlType == ControlType.VELOCITY) {
+    } else if (commandUnits == CommandUnits.FPS) {
       setVelocityOutput(HelixMath.convertFromFpsToTicksPer100Ms(left, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
         HelixMath.convertFromFpsToTicksPer100Ms(right, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
         );
-    } else if (commandType == CommandType.TICKSPER100MS && controlType == ControlType.VELOCITY) {
+    } else if (commandUnits == CommandUnits.TICKSPER100MS) {
       setVelocityOutput(left, right);
     } else {
       setPowerOutput(left, right);
