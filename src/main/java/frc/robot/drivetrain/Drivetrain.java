@@ -87,23 +87,25 @@ public class Drivetrain extends Subsystem {
   }
 
   public void setSetpoint(CommandUnits commandUnits, double left, double right) {
-    if (commandUnits == CommandUnits.PERCENT_FULLPOWER) {
-      setPowerOutput(left, right);
-    } else if (commandUnits == CommandUnits.PERCENT_FULLSPEED) {
-      setVelocityOutput(
-        HelixMath.convertFromFpsToTicksPer100Ms(left * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
-        HelixMath.convertFromFpsToTicksPer100Ms(right * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
-        );
-    } else if (commandUnits == CommandUnits.FPS) {
-      setVelocityOutput(HelixMath.convertFromFpsToTicksPer100Ms(left, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
-        HelixMath.convertFromFpsToTicksPer100Ms(right, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
-        );
-    } else if (commandUnits == CommandUnits.TICKSPER100MS) {
-      setVelocityOutput(left, right);
-    } else {
-      setPowerOutput(left, right);
+    switch (commandUnits) {
+      case PERCENT_FULLPOWER:
+        setPowerOutput(left, right);
+        break;
+      case PERCENT_FULLSPEED:
+        setVelocityOutput(
+          HelixMath.convertFromFpsToTicksPer100Ms(left * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
+          HelixMath.convertFromFpsToTicksPer100Ms(right * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
+          );
+        break;
+      case FPS:
+        setVelocityOutput(HelixMath.convertFromFpsToTicksPer100Ms(left, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
+          HelixMath.convertFromFpsToTicksPer100Ms(right, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
+          );
+        break;
+      case TICKSPER100MS:
+        setVelocityOutput(left, right);
+      }
     }
-  }
 
   private void setPIDFValues() {
     double kF = 1.25;
