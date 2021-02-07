@@ -11,8 +11,7 @@ import com.team2363.logger.HelixEvents;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.drivetrain.Drivetrain;
-import frc.robot.drivetrain.Drivetrain.CommandType;
-import frc.robot.drivetrain.Drivetrain.ControlType;
+import frc.robot.drivetrain.Drivetrain.CommandUnits;
 
 public class RampDown extends Command {
 
@@ -54,7 +53,7 @@ public class RampDown extends Command {
   protected void execute() {
     double headingError = heading - Drivetrain.getDrivetrain().getHeading();
     double headingCorrection = headingError * kP;
-    Drivetrain.getDrivetrain().setSetpoint(CommandType.FPS, ControlType.VELOCITY, currentVelocity + headingCorrection, currentVelocity - headingCorrection);
+    Drivetrain.getDrivetrain().setSetpoint(CommandUnits.FPS, currentVelocity + headingCorrection, currentVelocity - headingCorrection);
     currentVelocity -= acceleration;
   }
 
@@ -71,7 +70,7 @@ public class RampDown extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    Drivetrain.getDrivetrain().setSetpoint(CommandType.FPS, ControlType.VELOCITY, 0, 0);
+    Drivetrain.getDrivetrain().setSetpoint(CommandUnits.FPS, 0, 0);
     HelixEvents.getInstance().addEvent("DRIVETRAIN", "Finished Rampdown");
   }
 

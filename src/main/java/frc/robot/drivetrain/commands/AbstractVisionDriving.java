@@ -15,8 +15,7 @@ import com.team2363.logger.HelixEvents;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.drivetrain.Camera;
-import frc.robot.drivetrain.Drivetrain.CommandType;
-import frc.robot.drivetrain.Drivetrain.ControlType;
+import frc.robot.drivetrain.Drivetrain.CommandUnits;
 
 public abstract class AbstractVisionDriving extends Command {
 
@@ -61,6 +60,6 @@ public abstract class AbstractVisionDriving extends Command {
 
   private void calculate() {
     double output = controller.calculate(getDrivetrain().getHeading());
-    getDrivetrain().setSetpoint(CommandType.FPS, ControlType.VELOCITY, getThrottle() + output, getThrottle() - output);
+    getDrivetrain().setSetpoint(CommandUnits.FPS, getThrottle() + output, getThrottle() - output);
   }
 }

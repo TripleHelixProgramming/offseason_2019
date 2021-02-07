@@ -36,12 +36,8 @@ public class Drivetrain extends Subsystem {
     return INSTANCE;
   }
 
-  public enum CommandType {
-    PERCENT, FPS, TICKSPER100MS
-  }
-
-  public enum ControlType {
-    POWER, VELOCITY
+  public enum CommandUnits {
+    PERCENT_FULLPOWER, PERCENT_FULLSPEED, FPS, TICKSPER100MS
   }
 
   private final double WHEEL_DIAMETER_IN_INCHES = 4;
@@ -90,24 +86,26 @@ public class Drivetrain extends Subsystem {
     right.set(ControlMode.PercentOutput, rightPercent);
   }
 
-  public void setSetpoint(CommandType commandType, ControlType controlType, double left, double right) {
-    if (commandType == CommandType.PERCENT && controlType == ControlType.POWER) {
-      setPowerOutput(left, right);
-    } else if (commandType == CommandType.PERCENT && controlType == ControlType.VELOCITY) {
-      setVelocityOutput(
-        HelixMath.convertFromFpsToTicksPer100Ms(left * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
-        HelixMath.convertFromFpsToTicksPer100Ms(right * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
-        );
-    } else if (commandType == CommandType.FPS && controlType == ControlType.VELOCITY) {
-      setVelocityOutput(HelixMath.convertFromFpsToTicksPer100Ms(left, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
-        HelixMath.convertFromFpsToTicksPer100Ms(right, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
-        );
-    } else if (commandType == CommandType.TICKSPER100MS && controlType == ControlType.VELOCITY) {
-      setVelocityOutput(left, right);
-    } else {
-      setPowerOutput(left, right);
+  public void setSetpoint(CommandUnits commandUnits, double left, double right) {
+    switch (commandUnits) {
+      case PERCENT_FULLPOWER:
+        setPowerOutput(left, right);
+        break;
+      case PERCENT_FULLSPEED:
+        setVelocityOutput(
+          HelixMath.convertFromFpsToTicksPer100Ms(left * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
+          HelixMath.convertFromFpsToTicksPer100Ms(right * MAX_VELOCITY_IN_FPS, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
+          );
+        break;
+      case FPS:
+        setVelocityOutput(HelixMath.convertFromFpsToTicksPer100Ms(left, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION), 
+          HelixMath.convertFromFpsToTicksPer100Ms(right, WHEEL_DIAMETER_IN_INCHES, ENCODER_TICKS_PER_REVOLUTION)
+          );
+        break;
+      case TICKSPER100MS:
+        setVelocityOutput(left, right);
+      }
     }
-  }
 
   private void setPIDFValues() {
     double kF = 1.25;
